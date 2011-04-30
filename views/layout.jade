@@ -1,0 +1,16 @@
+!!! 5
+html(lang="en")
+  head
+    title= 'Nodepad'
+    
+    <!-- STYLES -->
+    link(rel='stylesheet', href='/css/style.css')
+    
+    <!-- SCRIPTS -->
+    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript', src='/lib/jquery-1.5.2.min.js')
+    script(type='text/javascript', src='/js/script.js')
+    
+  body
+    div#wrapper!= body
+    

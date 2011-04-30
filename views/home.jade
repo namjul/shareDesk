@@ -1,0 +1,20 @@
+!!! 5
+html(lang="en")
+  head
+    title= 'Nodepad'
+    
+    <!-- STYLES -->
+    link(rel='stylesheet', href='/css/style.css')
+    
+    <!-- SCRIPTS -->
+    script(type='text/javascript', src='/lib/jquery-1.5.2.min.js')
+    
+  body
+    div#wrapper
+      h1.home ShareDesk
+      form.home(onsubmit="return go();")
+        label Name your new Desktop:
+        br
+        input.text(type="text", name="name") formname
+
+    <script type="text/javascript">function go() {var value = document.forms[0].elements["name"].value; value = escape(value); window.location.href = value; return false;}</script>
