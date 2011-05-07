@@ -10,8 +10,9 @@ db = function(database, callback) {
 	var self = this;
 
 	this.db = new Db(database, new Server(conf.hostname, conf.port, {}, {}));
-
+	
 	this.db.open(function(err, db) {
+		if(db == null) throw new Error('no database connection');
 		db.collection('desks', function(err, collection) {
 			// make sure we have an index and unique constrain on name 
 			collection.ensureIndex({name : 1}, {unique : true}, function() {}) 
@@ -115,8 +116,7 @@ db.prototype.createFile = function(deskName, file, callback) {
     });
 };
 
-/* get desktop files
- * returns all the files in the given desktop as an array */
+/* get desktop files */
 db.prototype.getAllFiles = function(deskName, callback) {
     this.getCollection(function(error, desk_collection) {
       	if( error ) callback(error)

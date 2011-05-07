@@ -1,5 +1,27 @@
 
 
+// File model
+var File = Backbone.Model.extend({
+	name: null	
+});
+
+var Files = Backbone.Collection.extend({	
+	model: File
+});
+
+
+var FilesView = Backbone.View.extend({
+
+	el: $("div#wrapper"),
+
+  	render: function() {
+    
+  	}
+
+});
+
+/*
+
 var socket = new io.Socket(); 
  socket.connect();
 
@@ -71,4 +93,4 @@ function getMessage( m )
 	}
 
 
-}
+} /*

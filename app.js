@@ -9,12 +9,11 @@ var connect = require('connect'),
 	util = require('util'),
 	port = (process.env.PORT || 8081);	
 
-
+       
 ///////////////////////////////////////////
 //             SETUP Express             //
 ///////////////////////////////////////////
 var app = module.exports = express.createServer();
-
 
 app.configure(function(){
 	//views is the default folder already
