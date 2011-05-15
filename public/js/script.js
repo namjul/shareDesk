@@ -1,29 +1,6 @@
 
-
-// File model
-var File = Backbone.Model.extend({
-	name: null	
-});
-
-var Files = Backbone.Collection.extend({	
-	model: File
-});
-
-
-var FilesView = Backbone.View.extend({
-
-	el: $("div#wrapper"),
-
-  	render: function() {
-    
-  	}
-
-});
-
-/*
-
 var socket = new io.Socket(); 
- socket.connect();
+socket.connect();
 
 //an action has happened, send it to the
 //server
@@ -38,8 +15,6 @@ function sendAction(action, data)
 
 	socket.send ( message );
 }
-
-
 
 
 socket.on('connect', function(){ 
@@ -82,8 +57,18 @@ function getMessage( m )
 			break;
 			
 		case 'initFiles':
-			console.log("got the files");
-			console.log(data);
+			initFiles(data);
+			break;
+
+		case 'moveFile':
+			$("#" + data.id).animate({
+				left: data.position.left+"px",
+				top: data.position.top+"px" 
+			}, 500);
+			break;
+
+		case 'join-announce':
+			console.log('new User entered Desktop', data);
 			break;
 
 		default:
@@ -93,4 +78,49 @@ function getMessage( m )
 	}
 
 
-} /*
+} 
+
+
+function drawNewFile(file) {
+
+
+	var fileHTML = '<div id="' + file._id + '" class="file draggable" ><h1>' + file.name + '</h1></div>',
+			$file = $(fileHTML);
+
+	$file.appendTo('#wrapper');
+
+	$file.draggable();
+
+	$file.animate({left:file.x, top:file.y}, Math.floor(Math.random() * 1000));
+
+
+	//After a drag:
+	$file.bind( "dragstop", function(event, ui) {
+		console.log('dragstop', this);
+		var data = {
+			id: this.id,
+			position: ui.position,
+			oldposition: ui.originalPosition,
+		};
+		sendAction('moveFile', data);
+	});
+
+  	
+}
+
+//----------------------------------
+// files
+//----------------------------------
+
+function initFiles( fileArray ) {
+
+	for (i in fileArray) {
+
+		file = fileArray[i];
+		drawNewFile(file);
+
+	}
+}
+
+
+

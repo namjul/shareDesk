@@ -8,12 +8,11 @@ html(lang="en")
     
     <!-- SCRIPTS -->
     script(type='text/javascript', src='/lib/jquery-1.5.2.min.js')
+    script(type='text/javascript', src='/lib/jquery-ui-1.8.12.custom.min.js')
     script(type="text/javascript", src="/lib/underscore-min.js")
     script(type="text/javascript", src="/lib/backbone-min.js")
-    script(type='text/javascript', src='/lib/handlebars.js')
+    script(type='text/javascript', src='/lib/handlebars-0.9.0.pre.5.js')
     script(type='text/javascript', src='/socket.io/socket.io.js')  
     script(type='text/javascript', src='/js/script.js')
     
-  body
-    div#wrapper
-    
+  body!= body    

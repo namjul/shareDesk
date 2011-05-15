@@ -159,3 +159,56 @@ exports.remove_from_all_rooms_and_announce = function (client, msg) {
 		}
 	});
 }
+
+//////////////////////////////
+// Broadcasting functions
+//////////////////////////////
+
+// Broadcast message to all clients
+exports.broadcast = function(msg) {
+    if (socket) socket.broadcast(msg);
+    net_server_streams.each(function(stream) {
+	stream.write(JSON.stringify(msg)+'\r\n');
+    });
+};
+
+// Broadcast message to all clients in a given room.
+exports.broadcast_room = function(room, msg) {
+    var clients = exports.room_clients(room);
+    for (var i = 0; i < clients.length; i++)
+	clients[i].send(msg);
+};
+
+// Broadcast message to all the other clients that are in rooms with this client
+exports.broadcast_to_roommates = function (client, msg) {
+	var roommates = new sets.Set();
+
+   if (sid_rooms.hasOwnProperty(client.sessionId))
+	{
+		var client_rooms = sid_rooms[client.sessionId].array();
+		for (var i = 0; i < client_rooms.length; i++)
+		{
+		   var room = client_rooms[i];
+		   if (rooms.hasOwnProperty(room))
+			{
+				var this_room = rooms[room].array();
+				for (var j = 0; j < this_room.length; j++)
+					roommates.add(this_room[j]);
+		   }
+		}
+	}
+
+	//remove self from the set
+	roommates.remove(client);
+	roommates = roommates.array();
+
+	console.log('client: ' + client.sessionId + " is broadcasting to: ");
+
+   
+   for (var i = 0; i < roommates.length; i++)
+	{
+		console.log('  - ' + roommates[i].sessionId);
+		roommates[i].send(msg);
+	}
+}
+

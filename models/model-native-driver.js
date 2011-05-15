@@ -147,7 +147,7 @@ db.prototype.renameFile = function(deskName, id, newName, callback) {
       	if( error ) callback(error)
       	else {
       		desk_collection.update(
-						{'files._id': id},
+						{'files._id': ObjectId(id)},
 						{$set:{'files.$.name': newName}},
 						function(error, file) {
 							if( error ) callback(file)
@@ -164,7 +164,7 @@ db.prototype.setFilePosition = function(deskName, id, x, y, callback) {
       	if( error ) callback(error)
       	else {
       		desk_collection.update(
-						{'files._id': id},
+						{'files._id': ObjectId(id)},
 						{$set:{'files.$.y': y, 'files.$.x': x}},
 						function(error, file) {
 							if( error ) callback(file)
@@ -181,7 +181,7 @@ db.prototype.deleteFile = function(deskName, id, callback) {
       	if( error ) callback(error)
       	else {
       		desk_collection.update(
-						{'files._id': id},
+						{'files._id': ObjectId(id)},
 						{$unset:{'files.$': id}},
 						function(error, file) {
 							if( error ) callback(file)

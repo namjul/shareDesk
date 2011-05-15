@@ -10,7 +10,7 @@ var io = require('socket.io'),
 module.exports = function(app) {
 
 	var socket = io.listen(app),
-		model = app.model;
+			model = app.model;
 		
 	socket.on('connection', function(client) {
 		
@@ -30,6 +30,28 @@ module.exports = function(app) {
 				case 'joinRoom':
 					joinRoom(client, message.data, function(clients) {
 						client.send( { action: 'roomAccept', data: '' } );
+					});
+					break;
+
+				case 'moveFile':
+					
+					//report to all other browsers
+					var messageOut = {
+						action: message.action,
+						data: {
+							id: message.data.id,
+							position: {
+								left: message.data.position.left,
+								top: message.data.position.top
+							}
+						}
+					};
+
+
+					broadcastToRoom( client, messageOut );
+					
+					model.setFilePosition(null, message.data.id, message.data.position.left, message.data.position.top, function(error, file) {
+						console.log(error, file);	
 					});
 					break;
 
@@ -79,4 +101,8 @@ module.exports = function(app) {
 		callback(room);
 	}
 
+	function broadcastToRoom ( client, message ) {
+		rooms.broadcast_to_roommates(client, message);
+	}
+	
 }

@@ -91,7 +91,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/:id', function(req, res){
-	res.render('index', {
+	res.render('index.jade', {
 		locals: {pageTitle: ('shareDesk - ' + req.params.id) }
 	});
 });
