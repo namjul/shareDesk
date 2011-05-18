@@ -107,6 +107,7 @@ db.prototype.createFile = function(deskName, file, callback) {
 			desk_collection.update(
 						{name:deskName},
 						{$push:{files:file}},
+						{upsert: true},
 						function(error, file) {
 							if( error ) callback(file)
 							else callback(null, file);

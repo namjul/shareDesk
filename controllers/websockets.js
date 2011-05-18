@@ -4,13 +4,13 @@
 ///////////////////////////////////////////
 
 var io = require('socket.io'),
-	util = require('util'),
-	rooms	= require('../logics/rooms.js');
-
+	util = require('util');
+	
 module.exports = function(app) {
 
 	var socket = io.listen(app),
-			model = app.model;
+			model = app.model,
+			rooms	= app.rooms;
 		
 	socket.on('connection', function(client) {
 		

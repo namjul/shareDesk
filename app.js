@@ -7,13 +7,17 @@ var connect = require('connect'),
 	mongoStore = require('connect-mongodb'),
 	model = require('./models/model-native-driver').db,
 	util = require('util'),
-	port = (process.env.PORT || 8081);	
+	port = (process.env.PORT || 8081),
+	rooms	= require('./logics/rooms.js'),
+	formidable = require('formidable'),
+	fs = require('fs');
 
        
 ///////////////////////////////////////////
 //             SETUP Express             //
 ///////////////////////////////////////////
 var app = module.exports = express.createServer();
+app.rooms = rooms;
 
 app.configure(function(){
 	//views is the default folder already
@@ -72,11 +76,11 @@ app.get('/bad', function(req, res) {
   unknownMethod();
 });
 
-app.error(function(err, req, res, next) {
-  	if (err instanceof NotFound) {
+app.error(function(error, req, res, next) {
+  	if (error instanceof NotFound) {
     	res.render('404', { status: 404 });
   	} else {
-    	next(err);
+    	next(error);
   	}
 });
 
@@ -90,12 +94,86 @@ app.get('/', function(req, res){
   });
 });
 
-app.get('/:id', function(req, res){
+app.get('/download/:deskid/:fileid/*', function(req, res) {
+	// send file
+});
+
+app.get('/:deskname', function(req, res){
 	res.render('index.jade', {
-		locals: {pageTitle: ('shareDesk - ' + req.params.id) }
+		locals: {pageTitle: ('shareDesk - ' + req.params.deskname) }
 	});
 });
 
+app.post('/upload/:deskname/:filesgroupid', function(req, res) {
+	var filesgroupid = req.params.filesgroupid;
+	var rcvd_bytes_complete = 0;
+	var basedir = './uploads/';
+
+	var form = new formidable.IncomingForm(),
+		files = [],
+		fields = [];
+
+	// check directory, create if it not exists
+	var dir = basedir + req.params.deskname;
+	fs.stat(dir, function(error, stats) {
+		if(typeof stats=='undefined' || !stats.isDirectory()) {
+			fs.mkdir(dir, 448, function(error) {
+				fs.mkdir(basedir, 448, function(error) {
+					console.log(error);
+				});
+				fs.mkdir(dir, 448, function(error) {
+					console.log(error);
+				});
+			});
+		}
+	});
+
+	form.uploadDir = dir;
+
+	form.on('progress', function(bytesReceived, bytesExpected) {
+		var msg = {
+			action: 'progress',
+			data: {
+				filesgroupid: filesgroupid,
+				bytesReceived: bytesReceived,
+				bytesExpected: bytesExpected
+			}
+		};
+		rooms.broadcast_room(req.params.filesgroupid, msg);
+	});
+/*
+	form.on('fileBegin', function(name, file) {
+		console.log('fileBegin: ' + file.name + '\n');
+
+	});
+*/
+	form.on('file', function(name, file) {
+		var fileModel = {
+			name: file.name,
+			location: file.path,
+			x: -1,
+			y: -1,
+			format: file.type
+		}
+		var msg = {
+			action: 'createFile',
+			data: {
+				filesgroupid: filesgroupid,
+				file: fileModel
+			}
+		}
+		app.model.createFile(req.params.deskname, fileModel, function(error, file) {
+			if(error) console.log(error);
+		});
+		rooms.broadcast_room(req.params.deskname, msg);
+	});
+
+	form.parse(req, function(error, fields, files) {
+		res.writeHead(200, {'content-type': 'text/plain'});
+		res.write(util.inspect(fields));
+		res.end(util.inspect(files));
+	});
+});
 
 
 // start websockets controller
