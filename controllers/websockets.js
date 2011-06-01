@@ -109,7 +109,7 @@ module.exports = function(app) {
 	function newFile (client, file) {
 		var msg = {
 			action: 'newFile',
-			file: file
+			data: file
 		}
 		broadcastToRoom(client, msg);
 

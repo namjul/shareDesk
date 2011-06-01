@@ -45,7 +45,7 @@ function getMessage( m )
 	var action = message.action;
 	var data = message.data;
 
-	console.log('<-- ' + action);
+	console.log('<-- ' + action, m);
 
 	switch (action)
 	{
@@ -74,6 +74,16 @@ function getMessage( m )
 			console.log('new User entered Desktop', data);
 			break;
 
+		case 'newFile':
+			console.log('newFile', data);
+			drawUploadingFile(data.filesgroupid, data.name, data.x, data.y);
+			break;
+
+		case 'createFile':
+			console.log('createFile', data);
+			//File ist fertig geuploaded 
+			break;
+
 		case 'renameFile':
 			console.log('renameFile', data);
 			$("#" + data.id).find('h1').text(data.value);
@@ -82,6 +92,11 @@ function getMessage( m )
 		case 'deleteFile':
 			console.log('deleteFile', data);
 			$("#" + data.id).remove();
+			break;
+
+		case 'process':
+			console.log('process', data);
+			showProcess(data.filesgroupid, data.bytesReceived, data.bytesExpected);
 			break;
 
 		default:
@@ -159,10 +174,38 @@ function drawNewFile(id, name, x, y) {
 }
 
 //----------------------------------
+// Sho uploading file
+//----------------------------------
+function drawUploadingFile(filesgroupid, name, x, y) {
+	
+	console.log('drawUploadingFile');
+
+	var FileGroupId = filesgroupid;
+
+	var fileHTML = '<div class="file draggable ' + fileID + '">\
+									<h1>' + name + '</h1>\
+									</div>',
+		$file = $(fileHTML);
+
+	$file.css('top', y).css('left', x);
+
+	$file.appendTo('#wrapper');
+
+	$file.draggable();
+
+}
+
+//----------------------------------
+// Show Process of files 
+//----------------------------------
+function showProcess(id, bytesReceived, bytesExpected) {
+	console.log(id, bytesReceived, bytesExpected);
+}
+
+//----------------------------------
 // first time init files
 //----------------------------------
 function initFiles( fileArray ) {
-	console.log(fileArray[0]);
 	for (i in fileArray) {
 		file = fileArray[i];
 		drawNewFile(file._id, file.name, file.x, file.y);
@@ -482,7 +525,17 @@ $(function() {
 		type: 'POST',
 		dataType: 'json',
 		beforeSend: function () {
+
 			$(document.body).addClass('uploading');
+
+			var data = {
+				filesgroupid: uniqueID,
+				name: 'uploading',
+				x: $.mouseXposition,
+				y: $.mouseYposition	
+			};
+			sendAction('newFile', data);
+
 		},
 		complete: function () {
 			$(document.body).removeClass('uploading');
