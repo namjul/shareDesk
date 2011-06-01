@@ -134,70 +134,96 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 	var rcvd_bytes_complete = 0;
 	var basedir = './uploads/';
 
-	var form = new formidable.IncomingForm(),
-		files = [],
-		fields = [];
-
 	// check directory, create if it not exists
 	var dir = basedir + req.params.deskname;
 	fs.stat(dir, function(error, stats) {
 		if(typeof stats=='undefined' || !stats.isDirectory()) {
+			// create desk dir
 			fs.mkdir(dir, 448, function(error) {
-				fs.mkdir(basedir, 448, function(error) {
-					console.log(error);
-				});
-				fs.mkdir(dir, 448, function(error) {
-					console.log(error);
-				});
+				// if error, create first upload dir
+				if (error) {
+					fs.mkdir(basedir, 448, function(error) {
+						
+						if(error) {
+							console.log('could not create upload folder');	
+						}  
+						else {
+							
+							fs.mkdir(dir, 448, function(error) {
+								if (error) {
+									console.log(error);
+								}
+								else {
+									run('upload/desk');
+								}
+							});
+						}
+					});
+				}
+				else {
+					run('desk');
+				}
 			});
 		}
-	});
-
-	form.uploadDir = dir;
-
-	form.on('progress', function(bytesReceived, bytesExpected) {
-		var msg = {
-			action: 'progress',
-			data: {
-				filesgroupid: filesgroupid,
-				bytesReceived: bytesReceived,
-				bytesExpected: bytesExpected
-			}
-		};
-		rooms.broadcast_room(req.params.filesgroupid, msg);
-	});
-/*
-	form.on('fileBegin', function(name, file) {
-		console.log('fileBegin: ' + file.name + '\n');
-
-	});
-*/
-	form.on('file', function(name, file) {
-		var fileModel = {
-			name: file.name,
-			location: file.path,
-			x: -1,
-			y: -1,
-			format: file.type
+		else {
+			run('none');
 		}
-		var msg = {
-			action: 'createFile',
-			data: {
-				filesgroupid: filesgroupid,
-				file: fileModel
+	});
+
+	var run = function(msg) {
+
+		console.log(msg);
+		var form = new formidable.IncomingForm(),
+		    files = [],
+		    fields = [];
+
+		var oldProgressPercentage = 0;
+
+		form.uploadDir = dir;
+
+		// send progress, minimum one percent
+		form.on('progress', function(bytesReceived, bytesExpected) {
+			var newProgressPercentage = (bytesReceived / bytesExpected) * 100 | 0;
+			if(oldProgressPercentage < newProgressPercentage) {
+				var msg = {
+					action: 'progress',
+					data: {
+						filesgroupid: filesgroupid,
+						bytesReceived: bytesReceived,
+						bytesExpected: bytesExpected
+					}
+				}
+				rooms.broadcast_room(req.params.deskname, msg);
+				oldProgressPercentage = newProgressPercentage;
 			}
-		}
-		app.model.createFile(req.params.deskname, fileModel, function(error, file) {
-			if(error) console.log(error);
 		});
-		rooms.broadcast_room(req.params.deskname, msg);
-	});
 
-	form.parse(req, function(error, fields, files) {
-		res.writeHead(200, {'content-type': 'text/plain'});
-		res.write(util.inspect(fields));
-		res.end(util.inspect(files));
-	});
+		form.on('file', function(name, file) {
+			var fileModel = {
+				name: file.name,
+				location: file.path,
+				x: -1,
+				y: -1,
+				format: file.type
+			}
+			var msg = {
+				action: 'createFile',
+				data: {
+					filesgroupid: filesgroupid,
+					file: fileModel
+				}
+			}
+			app.model.createFile(req.params.deskname, fileModel, function(error, file) {
+				if(error) console.log(error);
+			});
+			rooms.broadcast_room(req.params.deskname, msg);
+		});
+
+		form.parse(req, function(error, fields, files) {
+			res.writeHead(200, {'content-type': 'text/plain'});
+			console.log("file received");
+		});
+	};
 });
 
 
