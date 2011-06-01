@@ -58,7 +58,7 @@ module.exports = function(app) {
 					break;
 
 				case 'newFile':
-					newFile(client, message.data.file);
+					newFile(client, message.data);
 					break;
 
 				case 'renameFile':
@@ -119,10 +119,10 @@ module.exports = function(app) {
 		successFunction();
 	}
 
-	function newFile (client, file) {
+	function newFile (client, data) {
 		var msg = {
 			action: 'newFile',
-			data: file
+			data: data
 		}
 		broadcastToRoom(client, msg);
 
