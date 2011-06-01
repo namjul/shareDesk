@@ -148,6 +148,8 @@ Uploader.prototype = {
 		 * * */
     startUpload: function(files) {
 
+				this.elements = [];
+
 			//count how many files FileReader has passed
 			var readFiles = 0;
 			
@@ -187,22 +189,15 @@ Uploader.prototype = {
 
 					var data = evt.target.result;
 					
-					// Make sure the data loaded is long enough to represent a real file.
-					if(data.length > 128){
-						/*
-						 * Per the Data URI spec, the only comma that appears is right after
-						 * 'base64' and before the encoded content.
-						 */
-						var base64StartIndex = data.indexOf(',') + 1;
+					self.elements.push({name:file.name, size:file.size, type:file.type, data: data});
 						
-						/*
-						 * Make sure the index we've computed is valid, otherwise something 
-						 * is wrong and we need to forget this upload.
-						 */
+					
+					if(data.length > 128){
+						var base64StartIndex = data.indexOf(',') + 1;
 						if(base64StartIndex < data.length) {
 							self.elements.push({name:file.name, size:file.size, type:file.type, data: data.substring(base64StartIndex) });
 						}
-					}
+					} 
 
 					//If all Files are read start sending them
 					if (++readFiles == files.length) {
@@ -232,7 +227,7 @@ Uploader.prototype = {
      * @return String A random string
      */
     generateBoundary: function() {
-			return "AJAX-----------------------" + (new Date).getTime();	
+			return "-----------------------" + (new Date).getTime();	
 		},
 
     /**
@@ -247,12 +242,13 @@ Uploader.prototype = {
 			
 			var CRLF = "\r\n";
    		var parts = [];
-			var boundary = this.generateBoundary();
-				
+			var boundary = this.generateBoundary();				
+
 			this.elements.forEach(function(element, index, all) {
-				
+
 				var part = "";
-				var fieldName = 'file';
+				
+				var fieldName = 'upload';
 
 				/*
 				 * Content-Disposition header contains name of the field
@@ -270,7 +266,7 @@ Uploader.prototype = {
 				 * approach and send a general binary header:
 				 * application/octet-stream
 				 */
-				part += "Content-Type: application/octet-stream";
+				part += "Content-Type: " + element.type;
 				part += CRLF + CRLF; // marks end of the headers part
 				
 				/*
@@ -303,24 +299,25 @@ Uploader.prototype = {
 				type: 'POST',
 				url: '/upload' + location.pathname + '/' + uniqueID,
 				data: this.buildMessage(), // Just send the Base64 content in POST body
-				processData: true,
+				processData: false,
 				timeout: 60000, // 1 min timeout
 				dataType: 'text', // Pure Base64 char data
+				contentType: null,
+				contentType: contentType,
 				beforeSend: function onBeforeSend(xhr, settings) {
 					// Put the important file data in headers
-					xhr.setRequestHeader('Content-Type', contentType);
+						xhr.setRequestHeader('Content-Type', contentType);
+
+						xhr.send = xhr.sendAsBinary;
 					
 					// Update status
-					console.log('Uploading and Processing ' + file.name + '...');
+					console.log('Uploading and Processing  + file.name + ...');
 				},
-				error: function onError(XMLHttpRequest, textStatus, errorThrown) {
-					
-					if(textStatus == "timeout") {
-						console.log('Upload was taking too long and was stopped.');
-					} else {
-						console.log('An error occurred while uploading the image.');
-					}
-				},
+				error: function (xhr,err) {
+
+					console.log("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
+   			  console.log("responseText: "+xhr.responseText);
+									},
 				success: function onUploadComplete(response) {
 					//response = $.parseJSON(response);
 
@@ -394,7 +391,6 @@ function initBrowserWarning() {
 }
 
 
-
 //Gloabl variables
 uploader = null;
 
@@ -403,11 +399,58 @@ uploader = null;
 ///////////////////////////////////////////
 $(function() {
 	
+	/*
 	uploader = new Uploader();
 
 	//Init Drag&Drop Upload
 	initBrowserWarning();
 	initDnD();
+	*/
+
+	//----------------------------------
+	// Upload script html5Uploader jQuery Plugin
+	//----------------------------------
+
+	// Detector demo
+	if (!$.fileUploadSupported) {
+		$(document.body).addClass('not_supported');
+		$('#detector').text('This browser is NOT supported.');
+	} else {
+		$('#detector').text('This browser is supported.');
+	}
+
+	// Detector demo
+	if (!$.imageUploadSupported) {
+		$(document.body).addClass('not_supported');
+		$('#image-detector').text('This browser DOES NOT supports image resizing and uploading.');
+	} else {
+		$('#image-detector').text('This browser supports image resizing and uploading.');
+	}
+
+	var uniqueID = Math.round(Math.random()*99999999);
+	// Enable plug-in
+	$('#wrapper').fileUpload( {
+		url: '/upload' + location.pathname + '/' + uniqueID,
+		type: 'POST',
+		dataType: 'json',
+		beforeSend: function () {
+			$(document.body).addClass('uploading');
+		},
+		complete: function () {
+			$(document.body).removeClass('uploading');
+		},
+		success: function (result, status, xhr) {
+			if (!result) {
+				window.alert('Server error.');
+				return;
+			}
+			if (result.error !== 0) {
+				window.alert(result.error);
+				return;
+			}
+			window.alert('Success! You have sent a file named \'' + result.name + '\' with MIME type \'' + result.type + '\'.');
+		}
+	});
+	
 	
 });
-

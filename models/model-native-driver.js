@@ -2,7 +2,8 @@
 var Db = require('../lib/mongodb/db').Db,
     ObjectId = require('../lib/mongodb/bson/bson').ObjectID,
     Server = require('../lib/mongodb/connection').Server,
-	conf = require('../config.js').database;;
+	conf = require('../config.js').database,
+	util = require('util');
 
 db = function(database, callback) {
 
@@ -117,6 +118,30 @@ db.prototype.createFile = function(deskName, file, callback) {
     });
 };
 
+/* get file */
+db.prototype.getFile = function(id, callback) {
+	this.getCollection(function(error, desk_collection) {
+		if(error) callback(error)
+		else {
+			desk_collection.findOne({'files._id':ObjectId(id)}, function(error, desk) {
+				if(error) callback(error)
+				else {
+					if(desk) {
+						for(var i in desk.files) {
+							if(desk.files[i]._id==id) {
+								callback(null, desk.files[i]);
+							}
+						}
+					}
+					else {
+						callback(null, []);
+					}
+				}
+			});
+		}
+	});
+};
+
 /* get desktop files */
 db.prototype.getAllFiles = function(deskName, callback) {
     this.getCollection(function(error, desk_collection) {
@@ -143,7 +168,7 @@ db.prototype.getAllFiles = function(deskName, callback) {
 };
 
 /* rename file */
-db.prototype.renameFile = function(deskName, id, newName, callback) {
+db.prototype.renameFile = function(id, newName, callback) {
     this.getCollection(function(error, desk_collection) {
       	if( error ) callback(error)
       	else {
@@ -155,6 +180,7 @@ db.prototype.renameFile = function(deskName, id, newName, callback) {
 							else callback(null, file);
 						}
 			);
+		console.log("after update");
       	}
     });
 };
@@ -177,7 +203,7 @@ db.prototype.setFilePosition = function(deskName, id, x, y, callback) {
 };
 
 /* delete file */
-db.prototype.deleteFile = function(deskName, id, callback) {
+db.prototype.deleteFile = function(id, callback) {
     this.getCollection(function(error, desk_collection) {
       	if( error ) callback(error)
       	else {

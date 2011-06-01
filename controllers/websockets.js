@@ -55,6 +55,13 @@ module.exports = function(app) {
 					});
 					break;
 
+				case 'renameFile':
+					renameFile(client, message.fileId, message.newName);
+					break;
+
+				case 'deleteFile':
+					deleteFile(client, message.fileId);
+					break;
 				default:
 					console.log('unknown action');
 					break;
@@ -94,6 +101,27 @@ module.exports = function(app) {
 		rooms.add_to_room_and_announce(client, room, msg);
 		successFunction();
 	}
+
+	function renameFile (client, fileId, newName) {
+		model.renameFile(fileId, newName, function(error, file) {
+			var msg = {};
+			msg.action = 'renameFile';
+			msg.data = { fileId: fileId, newName: newName };
+			broadcastToRoom(client, msg);
+			//broadcast?
+			//console.log(error);
+		});
+	}
+
+	function deleteFile (client, fileId) {
+		model.deleteFile(fileId, function(error, file) {
+			var msg = {};
+			msg.action = 'deleteFile';
+			msg.data = { fileId: fileId };
+			broadcastToRoom(client, msg);
+			//console.log(error);
+		});
+	}
 	
 	function getRoom( client , callback ) {
 		room = rooms.get_room( client );
@@ -106,3 +134,4 @@ module.exports = function(app) {
 	}
 	
 }
+
