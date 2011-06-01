@@ -74,6 +74,16 @@ function getMessage( m )
 			console.log('new User entered Desktop', data);
 			break;
 
+		case 'renameFile':
+			console.log('renameFile', data);
+			$("#" + data.id).find('h1').text(data.value);
+			break;
+
+		case 'deleteFile':
+			console.log('deleteFile', data);
+			$("#" + data.id).remove();
+			break;
+
 		default:
 			//unknown message
 			console.log('unknows message', data);
@@ -89,10 +99,12 @@ function getMessage( m )
 //----------------------------------
 function drawNewFile(id, name, x, y) {
 
-	var fileHTML = '<div id="' + id + '" class="file draggable">\
+	var fileID = id;
+
+	var fileHTML = '<div id="' + fileID + '" class="file draggable">\
 									<h1>' + name + '</h1>\
 									<div class="operations">\
-										<a class="download-file" href="http://' + location.host + '/download' + location.pathname + '/' + id + '">download</a>\
+										<a class="download-file" href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '">download</a>\
 										<a href="#" class="delete-file">delete</a>\
 									</div>\
 									</div>',
@@ -109,7 +121,7 @@ function drawNewFile(id, name, x, y) {
 	$file.bind( "dragstop", function(event, ui) {
 		console.log('dragstop', this);
 		var data = {
-			id: this.id,
+			id: fileID,
 			position: ui.position,
 			oldposition: ui.originalPosition,
 		};
@@ -120,7 +132,7 @@ function drawNewFile(id, name, x, y) {
 	$file.find('.delete-file').click(	function(){
 			$file.remove();
 			//notify server of delete
-			sendAction( 'deleteFile' , { 'id': this.id });
+			sendAction( 'deleteFile' , { 'id': fileID });
 		}
 	);
 	
@@ -140,11 +152,9 @@ function drawNewFile(id, name, x, y) {
 		$('form.file-edit-form').remove();
 
 		console.log('rename file', text, result);
-		sendAction('renameFile', { id: id, value: text });
+		sendAction('renameFile', { id: fileID, value: text });
 		return(text);
-	}
-	
-	
+	}	
 
 }
 
@@ -152,6 +162,7 @@ function drawNewFile(id, name, x, y) {
 // first time init files
 //----------------------------------
 function initFiles( fileArray ) {
+	console.log(fileArray[0]);
 	for (i in fileArray) {
 		file = fileArray[i];
 		drawNewFile(file._id, file.name, file.x, file.y);
