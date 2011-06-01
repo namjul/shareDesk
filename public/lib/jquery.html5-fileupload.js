@@ -88,6 +88,11 @@ window.log = function (s) {
 		}
 	};
 	
+	//Mouse position
+	var mouseX = 0;
+	var mouseY = 0;
+
+
 	// Feature detection
 	
 	// Read as binary string: FileReader API || Gecko-specific function (Fx3)
@@ -499,6 +504,11 @@ window.log = function (s) {
 				).bind(
 					'drop',
 					function (ev) {	
+
+						$.mouseXposition = ev.clientX;
+						$.mouseYposition = ev.clientY;
+
+
 						if (!ev.originalEvent.dataTransfer.files) {
 							log('ERROR: No FileList object present; user might had dropped text.');
 							return false;
@@ -524,5 +534,5 @@ window.log = function (s) {
 	$.imageUploadSupported = isImageSupported;
 	$.fileUploadAsBase64Supported = isSupportedInBase64;
 	$.imageUploadAsBase64Supported = isImageSupportedInBase64;
-	
+		
 })(jQuery);
