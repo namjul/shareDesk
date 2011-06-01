@@ -140,6 +140,7 @@ exports.add_to_room_and_announce = function (client, room, msg) {
 
 		// Add user info to the current dramatis personae
 		exports.add_to_room(client, room, function(clients) {
+		console.log(room);
 		    // Broadcast new-user notification
 		    for (var i = 0; i < clients.length; i++)
 			{
@@ -174,9 +175,10 @@ exports.broadcast = function(msg) {
 
 // Broadcast message to all clients in a given room.
 exports.broadcast_room = function(room, msg) {
-    var clients = exports.room_clients(room);
-    for (var i = 0; i < clients.length; i++)
-	clients[i].send(msg);
+	var clients = exports.room_clients(room);
+	for (var i = 0; i < clients.length; i++) {
+		clients[i].send(msg);
+	}
 };
 
 // Broadcast message to all the other clients that are in rooms with this client
