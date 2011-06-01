@@ -209,7 +209,7 @@ db.prototype.deleteFile = function(id, callback) {
       	else {
       		desk_collection.update(
 						{'files._id': ObjectId(id)},
-						{$unset:{'files.$': id}},
+						{$pull:{files:{'_id': ObjectId(id)}}},
 						function(error, file) {
 							if( error ) callback(file)
 							else callback(null, file);

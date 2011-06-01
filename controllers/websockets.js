@@ -119,7 +119,7 @@ module.exports = function(app) {
 		model.renameFile(fileId, newName, function(error, file) {
 			var msg = {};
 			msg.action = 'renameFile';
-			msg.data = { fileId: fileId, newName: newName };
+			msg.data = { id: fileId, value: newName };
 			broadcastToRoom(client, msg);
 			//broadcast?
 			//console.log(error);
@@ -130,7 +130,7 @@ module.exports = function(app) {
 		model.deleteFile(fileId, function(error, file) {
 			var msg = {};
 			msg.action = 'deleteFile';
-			msg.data = { fileId: fileId };
+			msg.data = { id: fileId };
 			broadcastToRoom(client, msg);
 			//console.log(error);
 		});
