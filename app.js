@@ -187,7 +187,7 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 				file: fileModel
 			}
 		}
-		app.model.createFile("/"+req.params.deskname, fileModel, function(error, file) {
+		app.model.createFile(req.params.deskname, fileModel, function(error, file) {
 			if(error) console.log(error);
 		});
 		rooms.broadcast_room(req.params.deskname, msg);
