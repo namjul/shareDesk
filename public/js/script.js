@@ -81,7 +81,7 @@ function getMessage( m )
 
 		case 'createFile':
 			console.log('createFile', data);
-			//File ist fertig geuploaded 
+			setUploadedFile(data.filesgroupid, data.file._id, data.file.name);
 			break;
 
 		case 'renameFile':
@@ -94,14 +94,14 @@ function getMessage( m )
 			$("#" + data.id).remove();
 			break;
 
-		case 'process':
+		case 'progress':
 			console.log('process', data);
 			showProcess(data.filesgroupid, data.bytesReceived, data.bytesExpected);
 			break;
 
 		default:
 			//unknown message
-			console.log('unknows message', data);
+			console.log('unknows message', action, data);
 			break;
 	}
 
@@ -122,8 +122,8 @@ function drawNewFile(id, name, x, y) {
 										<a class="download-file" href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '">download</a>\
 										<a href="#" class="delete-file">delete</a>\
 									</div>\
-									</div>',
-		$file = $(fileHTML);
+									</div>';
+	var $file = $(fileHTML);
 
 	$file.appendTo('#wrapper');
 
@@ -174,26 +174,89 @@ function drawNewFile(id, name, x, y) {
 }
 
 //----------------------------------
-// Sho uploading file
+// Show uploading file
 //----------------------------------
-function drawUploadingFile(filesgroupid, name, x, y) {
+function drawUploadingFile(filesgroupid, name, x, y, isOrigin) {
 	
-	console.log('drawUploadingFile');
+	if(isOrigin == undefined) isOrigin = '';
 
 	var FileGroupId = filesgroupid;
 
-	var fileHTML = '<div class="file draggable ' + fileID + '">\
+	var fileHTML = '<div class="file draggable ' + filesgroupid + ' ' + isOrigin + '">\
 									<h1>' + name + '</h1>\
-									</div>',
-		$file = $(fileHTML);
+									</div>';
+	var $file = $(fileHTML);
 
 	$file.css('top', y).css('left', x);
 
 	$file.appendTo('#wrapper');
 
+}
+
+//----------------------------------
+// Set file when upload has completed
+//----------------------------------
+function setUploadedFile(filesgroupid, id, name) {
+	
+	var $file = $('.'+filesgroupid);
+	var fileID = id;
+
+
+	if($file.hasClass("origin")) {
+		var data = {
+			id: fileID,
+			position: {
+				top: parseInt($file.css('top')),
+				left: parseInt($file .css('left'))
+			},
+		};
+		sendAction('moveFile', data);
+	}
+
+	$file.removeClass(filesgroupid);
+	$file.attr('id', fileID);
+	$file.find('h1').text(name);
+
+	var fileHTML = '<div class="operations">\
+									<a class="download-file" href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '">download</a>\
+									<a href="#" class="delete-file">delete</a>\
+								</div>';
+
+	$file.append(fileHTML);
+
 	$file.draggable();
 
+	//when user press delete button
+	$file.find('.delete-file').click(	function(){
+			$file.remove();
+			//notify server of delete
+			sendAction( 'deleteFile' , { 'id': fileID });
+		}
+	);
+	
+	//rename files
+	$file.find('h1').editable( onFileChange,
+		{
+			style   : 'inherit',
+			cssclass   : 'file-edit-form',
+			type      : 'textarea',
+			onblur: 'submit',
+			event: 'dblclick',			
+		}
+	);
+
+	function onFileChange( text, result ) {
+		
+		$('form.file-edit-form').remove();
+
+		console.log('rename file', text, result);
+		sendAction('renameFile', { id: fileID, value: text });
+		return(text);
+	}	
+
+
 }
+
 
 //----------------------------------
 // Show Process of files 
@@ -531,10 +594,12 @@ $(function() {
 			var data = {
 				filesgroupid: uniqueID,
 				name: 'uploading',
-				x: $.mouseXposition,
-				y: $.mouseYposition	
+				x: $.mouseXposition-20-50,
+				y: $.mouseYposition-20-30	
 			};
 			sendAction('newFile', data);
+			drawUploadingFile(uniqueID, 'uploading', $.mouseXposition-20-50, $.mouseYposition-20-30, 'origin');
+			console.log($.mouseXposition);
 
 		},
 		complete: function () {
