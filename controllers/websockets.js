@@ -55,12 +55,16 @@ module.exports = function(app) {
 					});
 					break;
 
+				case 'newFile':
+					newFile(client, message.data.file);
+					break;
+
 				case 'renameFile':
-					renameFile(client, message.fileId, message.newName);
+					renameFile(client, message.data.id, message.data.value);
 					break;
 
 				case 'deleteFile':
-					deleteFile(client, message.fileId);
+					deleteFile(client, message.data.id);
 					break;
 				default:
 					console.log('unknown action');
@@ -100,6 +104,15 @@ module.exports = function(app) {
 
 		rooms.add_to_room_and_announce(client, room, msg);
 		successFunction();
+	}
+
+	function newFile (client, file) {
+		var msg = {
+			action: 'newFile',
+			file: file
+		}
+		broadcastToRoom(client, msg);
+
 	}
 
 	function renameFile (client, fileId, newName) {

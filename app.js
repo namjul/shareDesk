@@ -94,7 +94,7 @@ app.get('/', function(req, res){
   });
 });
 
-app.get('/download/:deskid/:fileid', function(req, res) {
+app.get('/download/:deskname/:fileid', function(req, res) {
 	// send file
 	app.model.getFile(req.params.fileid, function(error, file) {
 		if(error) ;//console.log(error);
