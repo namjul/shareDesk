@@ -56,11 +56,11 @@ module.exports = function(app) {
 					break;
 
 				case 'renameFile':
-					renameFile(client, message.data.fileId, message.data.newName);
+					renameFile(client, message.fileId, message.newName);
 					break;
 
 				case 'deleteFile':
-					deleteFile(client, message.data.fileId);
+					deleteFile(client, message.fileId);
 					break;
 				default:
 					console.log('unknown action');
