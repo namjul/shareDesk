@@ -9,7 +9,7 @@ socket.connect();
 //an action has happened, send it to the server
 function sendAction(action, data)
 {
-	console.log('--> ' + action);
+	console.log('--> ' + action, data);
 
 	var message = { 
 		action: action,
@@ -24,7 +24,7 @@ socket.on('connect', function(){
 	console.log('successful socket.io connect');
 
 	//let the path be the room name
-	var path = location.pathname;
+	var path = location.pathname.substr(1);
 
 	//imediately join the room which will trigger the initializations
 	sendAction('joinRoom', path);
@@ -45,7 +45,7 @@ function getMessage( m )
 	var action = message.action;
 	var data = message.data;
 
-	//console.log('<-- ' + action);
+	console.log('<-- ' + action);
 
 	switch (action)
 	{
@@ -76,20 +76,27 @@ function getMessage( m )
 
 		default:
 			//unknown message
-			alert('unknown action: ' + JSON.stringify(message));
+			console.log('unknows message', data);
 			break;
 	}
 
 
 } 
 
+
 //----------------------------------
 // Just Drawing a new file
 //----------------------------------
 function drawNewFile(id, name, x, y) {
 
-	var fileHTML = '<div id="' + id + '" class="file draggable" ><h1>' + name + '</h1></div>',
-			$file = $(fileHTML);
+	var fileHTML = '<div id="' + id + '" class="file draggable">\
+									<h1>' + name + '</h1>\
+									<div class="operations">\
+										<a class="download-file" href="http://' + location.host + '/download' + location.pathname + '/' + id + '">download</a>\
+										<a href="#" class="delete-file">delete</a>\
+									</div>\
+									</div>',
+		$file = $(fileHTML);
 
 	$file.appendTo('#wrapper');
 
@@ -108,6 +115,36 @@ function drawNewFile(id, name, x, y) {
 		};
 		sendAction('moveFile', data);
 	});
+
+	//when user press delete button
+	$file.find('.delete-file').click(	function(){
+			$file.remove();
+			//notify server of delete
+			sendAction( 'deleteFile' , { 'id': this.id });
+		}
+	);
+	
+	//rename files
+	$file.find('h1').editable( onFileChange,
+		{
+			style   : 'inherit',
+			cssclass   : 'file-edit-form',
+			type      : 'textarea',
+			onblur: 'submit',
+			event: 'dblclick',			
+		}
+	);
+
+	function onFileChange( text, result ) {
+		
+		$('form.file-edit-form').remove();
+
+		console.log('rename file', text, result);
+		sendAction('renameFile', { id: id, value: text });
+		return(text);
+	}
+	
+	
 
 }
 
