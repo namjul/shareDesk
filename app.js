@@ -97,25 +97,33 @@ app.get('/', function(req, res){
 app.get('/download/:deskname/:fileid', function(req, res) {
 	// send file
 	app.model.getFile(req.params.fileid, function(error, file) {
-		if(error) ;//console.log(error);
+		if(error) {
+			console.log("getFile error", error);
+		}
 		else {
-			if(typeof file != 'undefined')
-			fs.readFile("./"+file.location, function(error, data){
-				if (error) console.log(error);
-				if (typeof data == 'undefined') {
-					res.writeHead('404');
-					res.end();
-				} else {
-					res.writeHead('200', {
-						'Content-Type' : file.format,
-						'Content-Length' : data.length,
-						'Content-Disposition' : 'attachment; filename=' + file.name
-					});
-					res.write(data);
-					res.end();
-				}
-			});
+			if(typeof file != 'undefined') {
+				fs.readFile("./"+file.location, function(error, data){
+					if (error) console.log("readFile error", error);
+					else {
+						if (typeof data == 'undefined') {
+							console.log("data is undefined");
+							res.writeHead('404');
+							res.end();
+						} else {
+							console.log("send file");
+							res.writeHead('200', {
+								'Content-Type' : file.format,
+								'Content-Length' : data.length,
+								'Content-Disposition' : 'attachment; filename=' + file.name
+							});
+							res.write(data);
+							res.end();
+						}
+					}
+				});
+			}
 			else {
+				console.log("cannot read file");
 				res.writeHead('404');
 				res.end();
 			}
@@ -206,17 +214,20 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 				y: -1,
 				format: file.type
 			}
-			var msg = {
-				action: 'createFile',
-				data: {
-					filesgroupid: filesgroupid,
-					file: fileModel
+
+			app.model.createFile(req.params.deskname, fileModel, function(error, db_file) {
+				if (error) console.log(error);
+				else {
+					var msg = {
+						action: 'createFile',
+						data: {
+							filesgroupid: filesgroupid,
+							file: fileModel
+						}
+					}
+					rooms.broadcast_room(req.params.deskname, msg);
 				}
-			}
-			app.model.createFile(req.params.deskname, fileModel, function(error, file) {
-				if(error) console.log(error);
 			});
-			rooms.broadcast_room(req.params.deskname, msg);
 		});
 
 		form.parse(req, function(error, fields, files) {
