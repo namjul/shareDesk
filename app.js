@@ -19,7 +19,7 @@ var connect = require('connect'),
 var app = module.exports = express.createServer();
 app.rooms = rooms;
 
-app.configure(function(){
+app.configure(function() {
 	//views is the default folder already
   	app.set('views', __dirname + '/views');
   	app.set('view engine', 'jade');
@@ -39,13 +39,13 @@ app.configure('test', function() {
 	app.model = new model('sharedesk-test', function() {});
 });
 
-app.configure('development', function(){
+app.configure('development', function() {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 	app.set('db-uri', 'mongodb://localhost/sharedesk-development');
 	app.model = new model('sharedesk-development', function() {});
 });
 
-app.configure('production', function(){
+app.configure('production', function() {
 	app.set('db-uri', 'mongodb://localhost/sharedesk-production');
 	app.model = new model('sharedesk-production', function() {});
 });
@@ -65,15 +65,15 @@ function NotFound(msg) {
 util.inherits(NotFound, Error);
 
 app.get('/404', function(req, res) {
-  throw new NotFound;
+	throw new NotFound;
 });
 
 app.get('/500', function(req, res) {
-  throw new Error('An expected error');
+	throw new Error('An expected error');
 });
 
 app.get('/bad', function(req, res) {
-  unknownMethod();
+	unknownMethod();
 });
 
 app.error(function(error, req, res, next) {
@@ -89,9 +89,9 @@ app.error(function(error, req, res, next) {
 ///////////////////////////////////////////
 
 app.get('/', function(req, res){
-  res.render('home', {
-    layout: false
-  });
+	res.render('home', {
+		layout: false
+	});
 });
 
 app.get('/download/:deskname/:fileid', function(req, res) {
@@ -103,18 +103,19 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 		else {
 			if(typeof file != 'undefined') {
 				fs.readFile("./"+file.location, function(error, data){
-					if (error) console.log("readFile error", error);
+					if (error) {
+						console.log("readFile error", error);
+					}
 					else {
 						if (typeof data == 'undefined') {
 							console.log("data is undefined");
 							res.writeHead('404');
 							res.end();
 						} else {
-							console.log("send file");
 							res.writeHead('200', {
-								'Content-Type' : file.format,
+								'Content-Type' : file.type,
 								'Content-Length' : data.length,
-								'Content-Disposition' : 'attachment; filename=' + file.name
+								'Content-Disposition' : 'attachment;filename=' + file.name
 							});
 							res.write(data);
 							res.end();
@@ -143,8 +144,8 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 	var basedir = './uploads/';
 
 	var form = new formidable.IncomingForm(),
-		    files = [],
-		    fields = [];
+		files = [],
+		fields = [];
 
 	var oldProgressPercentage = 0;
 	var dir = basedir + req.params.deskname;
@@ -223,8 +224,8 @@ require('./controllers/websockets')(app);
 
 // Only listen on $ node app.js
 if (!module.parent) {
-  app.listen(port);
-  console.log("ShareDesk server listening on port %d", app.address().port);
+	app.listen(port);
+	console.log("ShareDesk server listening on port %d", app.address().port);
 }
 
 
