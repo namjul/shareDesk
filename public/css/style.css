@@ -74,3 +74,13 @@ form.home input {
 .file h1 {
   color: #fff;
 }
+.file div.operations {
+  position: absolute;
+  top: 60px;
+  left: 0;
+}
+.file a.download, .file a.delete {
+  position: relative;
+  top: 0;
+  left: 0;
+}
