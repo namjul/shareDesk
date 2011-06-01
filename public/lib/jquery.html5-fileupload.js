@@ -498,7 +498,7 @@ window.log = function (s) {
 					}
 				).bind(
 					'drop',
-					function (ev) {
+					function (ev) {	
 						if (!ev.originalEvent.dataTransfer.files) {
 							log('ERROR: No FileList object present; user might had dropped text.');
 							return false;
@@ -507,7 +507,7 @@ window.log = function (s) {
 							log('ERROR: User had dropped a virual file (e.g. "My Computer")');
 							return false;
 						}
-						if (!ev.originalEvent.dataTransfer.files.length > 1) {
+						if (ev.originalEvent.dataTransfer.files.length > 1) {
 							log('WARN: Multiple file upload not implemented yet, only first file will be uploaded.');
 						}
 						handleFile($.extend({}, config, settings), ev.originalEvent.dataTransfer.files[0]);
