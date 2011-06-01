@@ -11,18 +11,19 @@ var io = require('socket.io'),
 module.exports = function(app) {
 
 	var socket = io.listen(app),
-			model = app.model,
-			rooms	= app.rooms;
+		model = app.model,
+		rooms	= app.rooms;
 		
-	socket.on('connection', function(client) {
-		
-		// new client is here!
 
+	socket.on('connection', function(client) {
+		// new client is here!
 		client.on('message', function( message ) { 
 
 			console.log("action: " + message.action + " -- data: " + util.inspect(message.data) );
 
-			if (!message.action)	return;
+			if (!message.action) {
+				return;
+			}
 
 			switch (message.action) {
 				case 'initializeMe':
@@ -37,28 +38,11 @@ module.exports = function(app) {
 
 				case 'moveFile':
 					
-					//report to all other browsers
-					var messageOut = {
-						action: message.action,
-						data: {
-							id: message.data.id,
-							position: {
-								left: message.data.position.left,
-								top: message.data.position.top
-							}
-						}
-					};
-
-
-					broadcastToRoom( client, messageOut );
-					
-					model.setFilePosition(null, message.data.id, message.data.position.left, message.data.position.top, function(error, file) {
-						console.log(error, file);	
-					});
+					moveFile(client, message);
 					break;
 
 				case 'newFile':
-					newFile(client, message.data.file);
+					newFile(client, message.data);
 					break;
 
 				case 'renameFile':
@@ -75,7 +59,7 @@ module.exports = function(app) {
 		});
 
 		client.on('disconnect', function() {
-				//leaveRoom(client);
+			//leaveRoom(client);
 		});
 
 	  //tell all others that someone has connected
@@ -98,11 +82,13 @@ module.exports = function(app) {
 
 		});
 	}
+
 	
 	function joinRoom (client, room, successFunction) {
-		var msg = {};
-		msg.action = 'join-announce';
-		msg.data		= { sid: client.sessionId, user_name: client.user_name };
+		var msg = {
+			action : 'join-announce',
+			data : { sid: client.sessionId, user_name: client.user_name }
+		}
 
 		rooms.add_to_room_and_announce(client, room, msg);
 
@@ -119,14 +105,37 @@ module.exports = function(app) {
 		successFunction();
 	}
 
-	function newFile (client, file) {
+
+	function moveFile(client, msg) {
+		//report to all other browsers
+		var messageOut = {
+			action: msg.action,
+			data: {
+				id: msg.data.id,
+				position: {
+					left: msg.data.position.left,
+					top: msg.data.position.top
+				}
+			}
+		};
+
+		broadcastToRoom( client, messageOut );
+
+		model.setFilePosition(null, msg.data.id, msg.data.position.left, msg.data.position.top, function(error, file) {
+			console.log("setFilePosition error:", error);	
+		});
+	}
+
+
+	function newFile (client, data) {
 		var msg = {
 			action: 'newFile',
-			data: file
+			data: data
 		}
 		broadcastToRoom(client, msg);
 
 	}
+
 
 	function renameFile (client, fileId, newName) {
 		model.renameFile(fileId, newName, function(error, file) {
@@ -139,21 +148,39 @@ module.exports = function(app) {
 		});
 	}
 
+
 	function deleteFile (client, fileId) {
-		model.deleteFile(fileId, function(error, file) {
-			var msg = {};
-			msg.action = 'deleteFile';
-			msg.data = { id: fileId };
-			broadcastToRoom(client, msg);
-			//console.log(error);
+		model.getFile(fileId, function(error, file) {
+			if(error) {
+				console.log(error);
+			}
+			else {
+				model.deleteFile(fileId, function(error, file) {
+					if(error) {
+						console.log(error);
+					}
+					else {
+						var msg = {
+							action : 'deleteFile',
+							data : { id: fileId }
+						};
+						broadcastToRoom(client, msg);
+					}
+				});
+			}
+			fs.unlink(file.location, function(error, test) {
+				//console.log(error, test);
+			});
 		});
 	}
+
 	
 	function getRoom( client , callback ) {
 		room = rooms.get_room( client );
 		//console.log( 'client: ' + client.sessionId + " is in " + room);
 		callback(room);
 	}
+
 
 	function broadcastToRoom ( client, message ) {
 		rooms.broadcast_to_roommates(client, message);
