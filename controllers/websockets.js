@@ -4,7 +4,9 @@
 ///////////////////////////////////////////
 
 var io = require('socket.io'),
-	util = require('util');
+	util = require('util'),
+	fs = require('fs');
+
 	
 module.exports = function(app) {
 
@@ -103,6 +105,17 @@ module.exports = function(app) {
 		msg.data		= { sid: client.sessionId, user_name: client.user_name };
 
 		rooms.add_to_room_and_announce(client, room, msg);
+
+		//create desk upload folder
+		var dir = app.uploadFolder + '/' + room;
+		fs.stat(dir, function(error, stats) {
+			if(typeof stats=='undefined' || !stats.isDirectory()) {
+				fs.mkdir(dir, 448, function(error) {
+					if (error) throw new Error('could not create ' + app.uploadFolder + ' folder');
+				});
+			}
+		});
+
 		successFunction();
 	}
 

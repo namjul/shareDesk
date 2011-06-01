@@ -40,7 +40,7 @@ app.configure('test', function() {
 });
 
 app.configure('development', function(){
-  	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 	app.set('db-uri', 'mongodb://localhost/sharedesk-development');
 	app.model = new model('sharedesk-development', function() {});
 });
@@ -142,106 +142,84 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 	var rcvd_bytes_complete = 0;
 	var basedir = './uploads/';
 
-	// check directory, create if it not exists
-	var dir = basedir + req.params.deskname;
-	fs.stat(dir, function(error, stats) {
-		if(typeof stats=='undefined' || !stats.isDirectory()) {
-			// create desk dir
-			fs.mkdir(dir, 448, function(error) {
-				// if error, create first upload dir
-				if (error) {
-					fs.mkdir(basedir, 448, function(error) {
-						
-						if(error) {
-							console.log('could not create upload folder');	
-						}  
-						else {
-							
-							fs.mkdir(dir, 448, function(error) {
-								if (error) {
-									console.log(error);
-								}
-								else {
-									run('upload/desk');
-								}
-							});
-						}
-					});
-				}
-				else {
-					run('desk');
-				}
-			});
-		}
-		else {
-			run('none');
-		}
-	});
-
-	var run = function(msg) {
-
-		console.log(msg);
-		var form = new formidable.IncomingForm(),
+	var form = new formidable.IncomingForm(),
 		    files = [],
 		    fields = [];
 
-		var oldProgressPercentage = 0;
+	var oldProgressPercentage = 0;
+	var dir = basedir + req.params.deskname;
 
-		form.uploadDir = dir;
+	form.uploadDir = dir;
 
-		// send progress, minimum one percent
-		form.on('progress', function(bytesReceived, bytesExpected) {
-			var newProgressPercentage = (bytesReceived / bytesExpected) * 100 | 0;
-			if(oldProgressPercentage < newProgressPercentage) {
+	// send progress, minimum one percent
+	form.on('progress', function(bytesReceived, bytesExpected) {
+		console.log('process');
+		var newProgressPercentage = (bytesReceived / bytesExpected) * 100 | 0;
+		if(oldProgressPercentage < newProgressPercentage) {
+			var msg = {
+				action: 'progress',
+				data: {
+					filesgroupid: filesgroupid,
+					bytesReceived: bytesReceived,
+					bytesExpected: bytesExpected
+				}
+			}
+			rooms.broadcast_room(req.params.deskname, msg);
+			oldProgressPercentage = newProgressPercentage;
+		}
+	});
+
+	form.on('file', function(name, file) {
+		console.log('file');
+		var fileModel = {
+			name: file.name,
+			location: file.path,
+			x: -1,
+			y: -1,
+			format: file.type
+		}
+
+		app.model.createFile(req.params.deskname, fileModel, function(error, db_file) {
+			if (error) console.log(error);
+			else {
 				var msg = {
-					action: 'progress',
+					action: 'createFile',
 					data: {
 						filesgroupid: filesgroupid,
-						bytesReceived: bytesReceived,
-						bytesExpected: bytesExpected
+						file: fileModel
 					}
 				}
 				rooms.broadcast_room(req.params.deskname, msg);
-				oldProgressPercentage = newProgressPercentage;
 			}
 		});
+	});
 
-		form.on('file', function(name, file) {
-			var fileModel = {
-				name: file.name,
-				location: file.path,
-				x: -1,
-				y: -1,
-				format: file.type
-			}
+	form.parse(req, function(error, fields, files) {
 
-			app.model.createFile(req.params.deskname, fileModel, function(error, db_file) {
-				if (error) console.log(error);
-				else {
-					var msg = {
-						action: 'createFile',
-						data: {
-							filesgroupid: filesgroupid,
-							file: fileModel
-						}
-					}
-					rooms.broadcast_room(req.params.deskname, msg);
-				}
-			});
-		});
+		res.writeHead(200, {'content-type': 'text/plain'});
+		res.write('received upload:\n\n');
+		res.end(util.inspect({fields: fields, files: files}));
+		
+	});
 
-		form.parse(req, function(error, fields, files) {
-			res.writeHead(200, {'content-type': 'text/plain'});
-			console.log("file received");
-		});
-	};
 });
 
 
+
+
+//create Upload folder if not exists
+var uploadFolder = './uploads/';
+app.uploadFolder = uploadFolder;
+fs.stat(uploadFolder, function(error, stats) {
+	if(typeof stats=='undefined' || !stats.isDirectory()) {
+		fs.mkdir(uploadFolder, 448, function(error) {
+			if (error) throw new Error('could not create ' + uploadFolder + ' folder');
+		});
+	}
+});
+
 // start websockets controller
 require('./controllers/websockets')(app);
-
-
 
 // Only listen on $ node app.js
 if (!module.parent) {
