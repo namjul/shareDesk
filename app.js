@@ -24,16 +24,15 @@ app.configure(function() {
   	app.set('views', __dirname + '/views');
   	app.set('view engine', 'jade');
   	app.use(express.bodyParser());
-	//app.use(express.methodOverride());
 	app.use(express.cookieParser());
 	
 	app.use(express.session({ store: mongoStore(app.set('db-uri')), secret: 'keyboard cat'}));
-	//app.use(express.logger());
   	app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
   	app.use(app.router);
   	app.use(express.static(__dirname + '/public'));
 });
 
+// node environment, use in terminal: "export NODE_ENV=production"
 app.configure('test', function() {
 	app.set('db-uri', 'mongodb://localhost/sharedesk-test');
 	app.model = new model('sharedesk-test', function() {});
@@ -61,21 +60,24 @@ function NotFound(msg) {
   	Error.captureStackTrace(this, arguments.callee);
 }
 
-//equals to NotFound.prototype.__proto__ = Error.prototype; i think ^^
 util.inherits(NotFound, Error);
 
+// Not Found Page
 app.get('/404', function(req, res) {
 	throw new NotFound;
 });
 
+// Server Error Page
 app.get('/500', function(req, res) {
 	throw new Error('An expected error');
 });
 
+// Server Error Page
 app.get('/bad', function(req, res) {
 	unknownMethod();
 });
 
+// on error redirect to 404 page
 app.error(function(error, req, res, next) {
   	if (error instanceof NotFound) {
     	res.render('404', { status: 404 });
@@ -88,12 +90,17 @@ app.error(function(error, req, res, next) {
 //           ROUTES Controller           //
 ///////////////////////////////////////////
 
+
+// Home directory, create desk
 app.get('/', function(req, res){
 	res.render('home', {
 		layout: false
 	});
 });
 
+// Download Route
+// deskname is unimportant
+// fileid is the id for the whole group of file (if multiupload)
 app.get('/download/:deskname/:fileid', function(req, res) {
 	// send file
 	app.model.getFile(req.params.fileid, function(error, file) {
@@ -102,26 +109,26 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 		}
 		else {
 			if(typeof file != 'undefined') {
-				fs.readFile("./"+file.location, function(error, data){
-					if (error) {
-						console.log("readFile error", error);
-					}
-					else {
-						if (typeof data == 'undefined') {
-							console.log("data is undefined");
-							res.writeHead('404');
-							res.end();
-						} else {
-							res.writeHead('200', {
-								'Content-Type' : file.type,
-								'Content-Length' : data.length,
-								'Content-Disposition' : 'attachment;filename=' + file.name
-							});
-							res.write(data);
-							res.end();
-						}
-					}
+
+				// HTTP Header
+				res.writeHead('200', {
+					'Content-Type' : file.type,
+					'Content-Disposition' : 'attachment;filename=' + file.name
 				});
+						
+				// Filestream		
+				var read_stream = fs.createReadStream('./' + file.location);
+				read_stream.on("data", function(data){
+					res.write(data);
+				});
+				read_stream.on("error", function(err){
+					console.error("An error occurred: %s", err)
+				});
+				read_stream.on("close", function(){
+					res.end();
+					console.log("File closed.")
+				});
+
 			}
 			else {
 				console.log("cannot read file");
@@ -132,12 +139,16 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 	});
 });
 
+// Desk Route
+// different desk for each different name
 app.get('/:deskname', function(req, res){
 	res.render('index.jade', {
 		locals: {pageTitle: ('shareDesk - ' + req.params.deskname) }
 	});
 });
 
+// Upload Route
+// used to upload file with ajax
 app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 	var filesgroupid = req.params.filesgroupid;
 	var rcvd_bytes_complete = 0;
@@ -152,13 +163,12 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 
 	form.uploadDir = dir;
 
-	// send progress, minimum one percent
-	form.on('progress', function(bytesReceived, bytesExpected) {
-		console.log('process');
+	// send progress-message, at one percent-rate or above
+	form.on('progress', function(bytesReceived, bytesExpected) {									
 		var newProgressPercentage = (bytesReceived / bytesExpected) * 100 | 0;
 		if(oldProgressPercentage < newProgressPercentage) {
 			var msg = {
-				action: 'progress',
+				action: 'progress',																																																																																																																																																																																												
 				data: {
 					filesgroupid: filesgroupid,
 					bytesReceived: bytesReceived,
@@ -170,6 +180,7 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 		}
 	});
 
+	// uploading file done, save to db
 	form.on('file', function(name, file) {
 		console.log('file');
 		var fileModel = {
@@ -195,6 +206,8 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 		});
 	});
 
+	// start upload/receiving file
+	// close connection when done
 	form.parse(req, function(error, fields, files) {
 
 		res.writeHead(200, {'content-type': 'text/plain'});
@@ -205,10 +218,7 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 
 });
 
-
-
-
-//create Upload folder if not exists
+//create Upload folder if it not exists
 var uploadFolder = './uploads/';
 app.uploadFolder = uploadFolder;
 fs.stat(uploadFolder, function(error, stats) {
