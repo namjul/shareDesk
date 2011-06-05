@@ -117,17 +117,20 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 				});
 						
 				// Filestream		
-				var read_stream = fs.createReadStream('./' + file.location);
+				/*var read_stream = fs.createReadStream('./' + file.location);
 				read_stream.on("data", function(data){
 					res.write(data);
-				});
+				});*/
+				fs.createReadStream('./' + file.location, {
+					'bufferSize': 4 * 1024
+				}).pipe(res);/*
 				read_stream.on("error", function(err){
 					console.error("An error occurred: %s", err)
 				});
 				read_stream.on("close", function(){
 					res.end();
 					console.log("File closed.")
-				});
+				});*/
 
 			}
 			else {
