@@ -144,6 +144,9 @@ window.log = function (s) {
 			name: file.name || file.fileName
 		};
 
+
+		$.myFileType = file.type;
+
 		settings.resizeImage = !!(settings.imageMaxWidth || settings.imageMaxHeight);
 
 		if (settings.resizeImage && !isImageSupported && settings.allowUploadOriginalImage) {

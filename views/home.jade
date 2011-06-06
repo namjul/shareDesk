@@ -4,17 +4,18 @@ html(lang="en")
     title= 'Nodepad'
     
     <!-- STYLES -->
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Cabin+Sketch:bold')
     link(rel='stylesheet', href='/css/style.css')
     
     <!-- SCRIPTS -->
     script(type='text/javascript', src='/lib/jquery-1.5.2.min.js')
-    
+       
   body
     div#wrapper
-      h1.home ShareDesk
+      a.home(href='https://github.com/namjul/shareDesk') ShareDesk
       form.home(onsubmit="return go();")
-        label Name your new Desktop:
+        label(for="name") betrete einen Desktop
         br
-        input.text(type="text", name="name") formname
+        input.text(type="text", name="name", id="name") formname
 
     <script type="text/javascript">function go() {var value = document.forms[0].elements["name"].value; value = escape(value); window.location.href = value; return false;}</script>
