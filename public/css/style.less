@@ -10,13 +10,9 @@
 /* ----------------------------------------------------------------------*/
 #wrapper {
 	position:absolute;
-	top:20px;
-	left:20px;
-	right:20px;
-	bottom:20px;
-	border:solid 1px #9C9C9C;
-	background:#E8E8E8;
-	padding:20px;
+	width:100%;
+	height:100%;
+	background:url(../images/background.jpg);
 }
 	#dragSignal {
 		position:absolute;
@@ -28,14 +24,24 @@
 		border:solid 5px blue;
 	}
 
+	#uploadIcon {
+		position:absolute;
+		width:220px;
+		height:245px;
+		top:30px;
+		left:30px;
+		background:url(../images/chalkFontUpload.png) no-repeat;
+	}
+
 /* home page */
-h1.home {
-	margin:0;
+a.home {
 	font-family:'arial';
 	font-size:15px;
+	color:#615A5C;
 	width:200px;
-	margin:0 auto;
+	margin:10px auto 0 auto;
 	text-align:center;
+	display:block;
 }
 
 form.home {
@@ -50,50 +56,170 @@ form.home {
 	text-align:center;
 	
 	label {
-		font-family:'arial';
-		font-size:30px;
+		font-family:'Cabin Sketch', arial, serif;
+		font-size:25px;
 		margin:10px 0;
 		display:block;
+		color:#fff;
 	}
 	
 	input {
-		border:solid 1px #A1A1A1;
-		background:#D1D1D1;
+		border:solid 10px #404040;
+		background:#A39EA0;
 		height:40px;
-		width:300px;
+		width:260px;
 		color:#fff;
 		padding:5px 10px;
 		font-size:20px;
 		margin:10px;
+	
+		&:focus {
+			outline: none; 
+			background:#fff;
+			color:#52494B;
+
+		}
 	}
 
 }
 
-/* Files */
+/* New Files */
 .file {
-	width:60px;
-	height:20px;
+	width:100px;
+	height:90px;
 	position:absolute;
 	left:0;
 	top:0;
-	background:#E391B3;
-	border:solid 1px #fff;
-	padding:20px;
+	background:transparent;
 	text-align:center;
+	padding:3px;
 
-	h1 {
+	/*round borders*/
+	-moz-border-radius: 5px; /* FF1-3.6 */
+  -webkit-border-radius: 5px; /* Saf3-4, iOS 1-3.2, Android <1.6 */
+  border-radius: 5px; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+	
+	border:solid 3px transparent;
+
+	&:hover {
+		border-top:solid 3px rgba(255,255,255,0.4);
+		border-left:solid 3px rgba(255,255,255,0.4);
+		border-right:solid 3px rgba(255,255,255,0.4);
+
+		background:rgba(255,255,255,0.1);
+	}
+
+	h3 {
 		color:#fff;
-	}
-
-	div.operations {
-		position:absolute;
-		top:60px;
-		left:0;
-	}
-
-	a.download, a.delete {
-		position:relative;
-		top:0;
-		left:0;
+		font-family:'Courier';
+		font-size:10px;
 	}
 }
+
+.format {
+		position:relative;
+		width:100px;
+		height:65px;
+		z-index:1;
+
+		.image {
+			position:absolute;
+			top:0;
+			left:0;
+			width:100px;
+			height:65px;
+			background-position:center;
+		}
+
+		.progress {
+			background:#000;
+			position:absolute;
+			top:9px;
+			left:25px;
+			width:49px;
+			height:46px;
+		}
+	}
+
+
+.operations {
+	position:relative;
+	margin:0 20px;
+	height:10px;
+	margin-bottom:-3px;
+	z-index:2;
+
+	a {
+		display:block;
+		text-indent:-9999px;
+		width:10px;
+		height:10px;
+		float:right;
+		padding-left:5px;
+	}
+
+	a.download {
+		background:url(../images/download.png) no-repeat;
+	}
+
+	a.delete {
+		background:url(../images/delete.png) no-repeat;
+	}
+
+}
+
+form.file-edit-form {
+
+	input {
+		background:#fff;
+		border:none;
+		text-align:center;
+
+		&:focus {
+			outline: none; 
+			background:#fff;
+			color:#52494B;
+		}
+	}
+}
+
+/* File Types images*/
+.format {
+
+	.unknown {
+		background:url(../images/unknown.png) no-repeat;
+
+	}
+
+	.picture {
+		background:url(../images/picture.png) no-repeat;
+
+	}
+
+	.video {
+		background:url(../images/video.png) no-repeat;
+
+	}
+
+	.audio {
+		background:url(../images/audio.png) no-repeat;
+
+	}
+
+	.text {
+		background:url(../images/text.png) no-repeat;
+
+	}
+
+	.pdf {
+		background:url(../images/pdf.png) no-repeat;
+
+	}
+
+	.image {
+		background-position:center;
+	}
+
+}
+
+

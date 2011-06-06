@@ -85,8 +85,7 @@ function getMessage( m )
 			break;
 
 		case 'renameFile':
-			console.log('renameFile', data);
-			$("#" + data.id).find('h1').text(data.value);
+			$("#" + data.id).find('h3').text(data.value);
 			break;
 
 		case 'deleteFile':
@@ -95,7 +94,6 @@ function getMessage( m )
 			break;
 
 		case 'progress':
-			console.log('process', data);
 			showProcess(data.filesgroupid, data.bytesReceived, data.bytesExpected);
 			break;
 
@@ -112,24 +110,64 @@ function getMessage( m )
 //----------------------------------
 // Just Drawing a new file
 //----------------------------------
-function drawNewFile(id, name, x, y) {
+function drawNewFile(id, name, x, y, format) {
 
 	var fileID = id;
 
+	if(name.length > 14) {
+		name = name.substr(0, 14) + '..';
+	} 
+
+	var formatValue = format.substr(0,format.indexOf('/'));
+	var formatClass = '';
+
+	console.log(format);
+
+	switch(formatValue) {
+
+		case 'video': 
+									formatClass = 'video';
+									break;
+		case 'image':
+									formatClass = 'picture';
+									break;
+		case 'text':
+									formatClass = 'text';
+									break;
+		case 'audio':
+									formatClass = 'audio';
+									break;
+		case 'application':
+									if(format.substr(format.indexOf('/')+1) == 'pdf') {
+										formatClass = 'pdf';
+										break;
+									}
+		default: 			formatClass = 'unknown';
+									break;
+	}
+
+
 	var fileHTML = '<div id="' + fileID + '" class="file draggable">\
-									<h1>' + name + '</h1>\
-									<div class="operations">\
-										<a class="download-file" href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '">download</a>\
-										<a href="#" class="delete-file">delete</a>\
-									</div>\
+										<div class="operations">\
+											<a href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '" class="download">download</a>\
+											<a href="#" class="delete">delete</a>\
+										</div>\
+										<div class="format">\
+											<div class="image ' + formatClass + '"></div>\
+										</div>\
+										<h3 class="title">' + name + '</h3>\
 									</div>';
+
 	var $file = $(fileHTML);
 
 	$file.appendTo('#wrapper');
 
 	$file.draggable();
 
-	$file.animate({left:x, top:y}, Math.floor(Math.random() * 1000));
+	
+	$file.css('display', 'none').css('top', y).css('left', x);
+	$file.fadeIn(Math.floor(Math.random() * 3000));
+
 
 
 	//After a drag:
@@ -144,7 +182,7 @@ function drawNewFile(id, name, x, y) {
 	});
 
 	//when user press delete button
-	$file.find('.delete-file').click(	function(){
+	$file.find('.delete').click(	function(){
 			$file.remove();
 			//notify server of delete
 			sendAction( 'deleteFile' , { 'id': fileID });
@@ -152,23 +190,29 @@ function drawNewFile(id, name, x, y) {
 	);
 	
 	//rename files
-	$file.find('h1').editable( onFileChange,
+	$file.find('h3').editable( onFileChange,
 		{
 			style   : 'inherit',
 			cssclass   : 'file-edit-form',
-			type      : 'textarea',
+			type      : 'text',
 			onblur: 'submit',
-			event: 'dblclick',			
+			event: 'dblclick'						
 		}
 	);
 
 	function onFileChange( text, result ) {
-		
-		$('form.file-edit-form').remove();
 
-		console.log('rename file', text, result);
+		var input = $('form.' + result.cssclass).find('input');
+		var original = input.val();
+		var newtext = text;
+		if(original.length > 14) {
+			newtext = text.substr(0, 14) + '..';
+		} else {
+			newtext = original;
+		}
+		$('form.file-edit-form').remove();
 		sendAction('renameFile', { id: fileID, value: text });
-		return(text);
+		return(newtext);
 	}	
 
 }
@@ -176,15 +220,50 @@ function drawNewFile(id, name, x, y) {
 //----------------------------------
 // Show uploading file
 //----------------------------------
-function drawUploadingFile(filesgroupid, name, x, y, isOrigin) {
+function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 	
 	if(isOrigin == undefined) isOrigin = '';
 
 	var FileGroupId = filesgroupid;
 
+
+	var formatValue = format.substr(0,format.indexOf('/'));
+	var formatClass = '';
+
+	switch(formatValue) {
+
+		case 'video': 
+									formatClass = 'video';
+									break;
+		case 'image':
+									formatClass = 'picture';
+									break;
+		case 'text':
+									formatClass = 'text';
+									break;
+		case 'audio':
+									formatClass = 'audio';
+									break;
+		case 'application':
+									if(format.substr(format.indexOf('/')+1) == 'pdf') {
+										formatClass = 'pdf';
+										break;
+									}
+		default: 			formatClass = 'unknown';
+									break;
+	}
+
 	var fileHTML = '<div class="file draggable ' + filesgroupid + ' ' + isOrigin + '">\
-									<h1>' + name + '</h1>\
+										<div class="operations">\
+										</div>\
+										<div class="format">\
+											<div class="image ' + formatClass + '"></div>\
+											<div class="progress"></div>\
+										</div>\
+										<h3 class="title">uploading...</h3>\
 									</div>';
+
+
 	var $file = $(fileHTML);
 
 	$file.css('top', y).css('left', x);
@@ -215,19 +294,21 @@ function setUploadedFile(filesgroupid, id, name) {
 
 	$file.removeClass(filesgroupid);
 	$file.attr('id', fileID);
-	$file.find('h1').text(name);
 
-	var fileHTML = '<div class="operations">\
-									<a class="download-file" href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '">download</a>\
-									<a href="#" class="delete-file">delete</a>\
-								</div>';
+	if(name.length > 14) {
+		name = name.substr(0, 14) + '..';
+	} 
 
-	$file.append(fileHTML);
+	$file.find('h3').text(name);
+
+	var fileHTML = '<a href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '" class="download">download</a><a href="#" class="delete">delete</a>';
+
+	$file.find('div.operations').prepend(fileHTML);
 
 	$file.draggable();
 
 	//when user press delete button
-	$file.find('.delete-file').click(	function(){
+	$file.find('.delete').click(	function(){
 			$file.remove();
 			//notify server of delete
 			sendAction( 'deleteFile' , { 'id': fileID });
@@ -235,23 +316,29 @@ function setUploadedFile(filesgroupid, id, name) {
 	);
 	
 	//rename files
-	$file.find('h1').editable( onFileChange,
+	$file.find('h3').editable( onFileChange,
 		{
 			style   : 'inherit',
 			cssclass   : 'file-edit-form',
-			type      : 'textarea',
+			type      : 'text',
 			onblur: 'submit',
 			event: 'dblclick',			
 		}
 	);
 
 	function onFileChange( text, result ) {
-		
-		$('form.file-edit-form').remove();
 
-		console.log('rename file', text, result);
+		var input = $('form.' + result.cssclass).find('input');
+		var original = input.val();
+		var newtext = text;
+		if(original.length > 14) {
+			newtext = text.substr(0, 14) + '..';
+		} else {
+			newtext = original;
+		}
+		$('form.file-edit-form').remove();
 		sendAction('renameFile', { id: fileID, value: text });
-		return(text);
+		return(newtext);
 	}	
 
 
@@ -262,7 +349,18 @@ function setUploadedFile(filesgroupid, id, name) {
 // Show Process of files 
 //----------------------------------
 function showProcess(id, bytesReceived, bytesExpected) {
-	console.log(id, bytesReceived, bytesExpected);
+	
+	var percent = ((bytesReceived/bytesExpected).toFixed(3));
+
+	
+	var newHeight = (((-percent*46) % 46) + 46) % 46;
+	var newOpacity = ((-percent*100 % 100) + 100) % 100;
+
+
+	$('.' + id + ' .progress').css('height', newHeight);
+	$('.' + id + ' .progress').css('opacity', newOpacity/100);
+
+
 }
 
 //----------------------------------
@@ -271,7 +369,7 @@ function showProcess(id, bytesReceived, bytesExpected) {
 function initFiles( fileArray ) {
 	for (i in fileArray) {
 		file = fileArray[i];
-		drawNewFile(file._id, file.name, file.x, file.y);
+		drawNewFile(file._id, file.name, file.x, file.y, file.format);
 	}
 }
 
@@ -573,13 +671,6 @@ $(function() {
 		$('#detector').text('This browser is supported.');
 	}
 
-	// Detector demo
-	if (!$.imageUploadSupported) {
-		$(document.body).addClass('not_supported');
-		$('#image-detector').text('This browser DOES NOT supports image resizing and uploading.');
-	} else {
-		$('#image-detector').text('This browser supports image resizing and uploading.');
-	}
 
 	var uniqueID = Math.round(Math.random()*99999999);
 	// Enable plug-in
@@ -595,11 +686,12 @@ $(function() {
 				filesgroupid: uniqueID,
 				name: 'uploading',
 				x: $.mouseXposition-20-50,
-				y: $.mouseYposition-20-30	
+				y: $.mouseYposition-20-30,
+				format: $.myFileType
 			};
 			sendAction('newFile', data);
-			drawUploadingFile(uniqueID, 'uploading', $.mouseXposition-20-50, $.mouseYposition-20-30, 'origin');
-			console.log($.mouseXposition);
+			drawUploadingFile(uniqueID, 'uploading', $.mouseXposition-20-50, $.mouseYposition-20-30, $.myFileType
+, 'origin');
 
 		},
 		complete: function () {
