@@ -76,12 +76,12 @@ function getMessage( m )
 
 		case 'newFile':
 			console.log('newFile', data);
-			drawUploadingFile(data.filesgroupid, data.name, data.x, data.y);
+			drawUploadingFile(data.filesgroupid, data.name, data.x, data.y, data.format);
 			break;
 
 		case 'createFile':
 			console.log('createFile', data);
-			setUploadedFile(data.filesgroupid, data.file._id, data.file.name);
+			setUploadedFile(data.filesgroupid, data.file._id, data.file.name, data.file.format);
 			break;
 
 		case 'renameFile':
@@ -260,7 +260,7 @@ function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 											<div class="image ' + formatClass + '"></div>\
 											<div class="progress"></div>\
 										</div>\
-										<h3 class="title">uploading...</h3>\
+										<h3 class="title">'+name+'</h3>\
 									</div>';
 
 
@@ -275,11 +275,42 @@ function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 //----------------------------------
 // Set file when upload has completed
 //----------------------------------
-function setUploadedFile(filesgroupid, id, name) {
+function setUploadedFile(filesgroupid, id, name, format) {
 	
 	var $file = $('.'+filesgroupid);
 	var fileID = id;
 
+	var formatValue = format.substr(0,format.indexOf('/'));
+	var formatClass = '';
+
+	switch(formatValue) {
+
+		case 'video': 
+									formatClass = 'video';
+									break;
+		case 'image':
+									formatClass = 'picture';
+									break;
+		case 'text':
+									formatClass = 'text';
+									break;
+		case 'audio':
+									formatClass = 'audio';
+									break;
+		case 'application':
+									if(format.substr(format.indexOf('/')+1) == 'pdf') {
+										formatClass = 'pdf';
+										break;
+									}
+		default: 			formatClass = 'unknown';
+									break;
+	}
+
+	var $fileFormat = $file.find('.image');
+	if($fileFormat.hasClass('unknown')) {
+		$fileFormat.removeClass('unknown');
+		$fileFormat.addClass(formatClass);
+	}
 
 	if($file.hasClass("origin")) {
 		var data = {
@@ -356,7 +387,10 @@ function showProcess(id, bytesReceived, bytesExpected) {
 	var newHeight = (((-percent*46) % 46) + 46) % 46;
 	var newOpacity = ((-percent*100 % 100) + 100) % 100;
 
-
+	if($('.'+id).length == 0) {
+		drawUploadingFile(id, 'uploading...', 0, 0, 'unknown');	
+	}
+	
 	$('.' + id + ' .progress').css('height', newHeight);
 	$('.' + id + ' .progress').css('opacity', newOpacity/100);
 
@@ -690,7 +724,7 @@ $(function() {
 				format: $.myFileType
 			};
 			sendAction('newFile', data);
-			drawUploadingFile(uniqueID, 'uploading', $.mouseXposition-20-50, $.mouseYposition-20-30, $.myFileType
+			drawUploadingFile(uniqueID, 'uploading...', $.mouseXposition-20-50, $.mouseYposition-20-30, $.myFileType
 , 'origin');
 
 		},
