@@ -338,6 +338,18 @@ function setUploadedFile(filesgroupid, id, name, format) {
 
 	$file.draggable();
 
+
+		//After a drag:
+	$file.bind( "dragstop", function(event, ui) {
+		console.log('dragstop', this);
+		var data = {
+			id: fileID,
+			position: ui.position,
+			oldposition: ui.originalPosition,
+		};
+		sendAction('moveFile', data);
+	});
+
 	//when user press delete button
 	$file.find('.delete').click(	function(){
 			$file.remove();
