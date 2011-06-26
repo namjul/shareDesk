@@ -26,11 +26,11 @@
 
 	#uploadIcon {
 		position:absolute;
-		width:220px;
-		height:245px;
+		width:100%;
+		height:100%;
 		top:30px;
 		left:30px;
-		background:url(../images/chalkFontUpload.png) no-repeat;
+		background:url(../images/newChalkFont.png) no-repeat;
 	}
 
 /* home page */
@@ -113,6 +113,8 @@ form.home {
 		color:#fff;
 		font-family:'Courier';
 		font-size:10px;
+		width:100px;
+		overflow-x:hidden;
 	}
 }
 
@@ -132,14 +134,46 @@ form.home {
 		}
 
 		.progress {
-			background:#000;
 			position:absolute;
 			top:9px;
 			left:25px;
 			width:49px;
 			height:46px;
+
+			background-color: transparent;
+  		background-color: rgba(0, 0, 0, 0.5);         			
+
 		}
 	}
+
+	.progressPercent {
+				position:absolute;
+				top:0;
+				left:0;
+				width: 49px;
+				height:46px;
+
+				.progressCenter {
+					height: 100%;
+					width: 49px;
+					display: table;
+					margin: 0px auto;
+
+					span {
+						position: static;
+						display: table-cell;
+						text-align: center;
+						vertical-align: middle;						
+						color:#fff;
+						font-size:15px;
+					}
+				}
+	}
+
+	.progressBack {
+		background:#000;
+	}
+
 
 
 .operations {
