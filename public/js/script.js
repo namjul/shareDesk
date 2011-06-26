@@ -113,10 +113,10 @@ function getMessage( m )
 function drawNewFile(id, name, x, y, format) {
 
 	var fileID = id;
-
+/*
 	if(name.length > 14) {
-		name = name.substr(0, 14) + '..';
-	} 
+		nameShortend = name.substr(0, 14) + '..';
+	} */
 
 	var formatValue = format.substr(0,format.indexOf('/'));
 	var formatClass = '';
@@ -205,11 +205,12 @@ function drawNewFile(id, name, x, y, format) {
 		var input = $('form.' + result.cssclass).find('input');
 		var original = input.val();
 		var newtext = text;
-		if(original.length > 14) {
-			newtext = text.substr(0, 14) + '..';
+		/*
+		if(original.length > 30) {
+			newtext = text.substr(0, 30) + '..';
 		} else {
 			newtext = original;
-		}
+		}*/
 		$('form.file-edit-form').remove();
 		sendAction('renameFile', { id: fileID, value: text });
 		return(newtext);
@@ -258,7 +259,14 @@ function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 										</div>\
 										<div class="format">\
 											<div class="image ' + formatClass + '"></div>\
-											<div class="progress"></div>\
+											<div class="progress">\
+												<div class="progressBack"></div>\
+												<div class="progressPercent">\
+													<div class="progressCenter">\
+														<span></span>\
+													</div>\
+												</div>\
+											</div>\
 										</div>\
 										<h3 class="title">'+name+'</h3>\
 									</div>';
@@ -326,11 +334,16 @@ function setUploadedFile(filesgroupid, id, name, format) {
 	$file.removeClass(filesgroupid);
 	$file.attr('id', fileID);
 
+/*
 	if(name.length > 14) {
 		name = name.substr(0, 14) + '..';
-	} 
+	} */
 
 	$file.find('h3').text(name);
+
+	$file.find('.progress').fadeOut(function() {
+		$(this).remove();	
+	});
 
 	var fileHTML = '<a href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '" class="download">download</a><a href="#" class="delete">delete</a>';
 
@@ -374,11 +387,12 @@ function setUploadedFile(filesgroupid, id, name, format) {
 		var input = $('form.' + result.cssclass).find('input');
 		var original = input.val();
 		var newtext = text;
-		if(original.length > 14) {
-			newtext = text.substr(0, 14) + '..';
+		/*
+		if(original.length > 30) {
+			newtext = text.substr(0, 30) + '..';
 		} else {
 			newtext = original;
-		}
+		}*/
 		$('form.file-edit-form').remove();
 		sendAction('renameFile', { id: fileID, value: text });
 		return(newtext);
@@ -402,9 +416,11 @@ function showProcess(id, bytesReceived, bytesExpected) {
 	if($('.'+id).length == 0) {
 		drawUploadingFile(id, 'uploading...', 0, 0, 'unknown');	
 	}
+
+	$('.' + id + ' .progressPercent span').text(Math.round(100*percent));
 	
-	$('.' + id + ' .progress').css('height', newHeight);
-	$('.' + id + ' .progress').css('opacity', newOpacity/100);
+	$('.' + id + ' .progressBack').css('height', newHeight);
+	$('.' + id + ' .progressBack').css('opacity', newOpacity/100);
 
 
 }
@@ -718,28 +734,12 @@ $(function() {
 	}
 
 
-	var uniqueID = Math.round(Math.random()*99999999);
+	//var uniqueID = Math.round(Math.random()*99999999);
 	// Enable plug-in
 	$('#wrapper').fileUpload( {
-		url: '/upload' + location.pathname + '/' + uniqueID,
+		url: '/upload' + location.pathname + '/',
 		type: 'POST',
 		dataType: 'json',
-		beforeSend: function () {
-
-			$(document.body).addClass('uploading');
-
-			var data = {
-				filesgroupid: uniqueID,
-				name: 'uploading',
-				x: $.mouseXposition-20-50,
-				y: $.mouseYposition-20-30,
-				format: $.myFileType
-			};
-			sendAction('newFile', data);
-			drawUploadingFile(uniqueID, 'uploading...', $.mouseXposition-20-50, $.mouseYposition-20-30, $.myFileType
-, 'origin');
-
-		},
 		complete: function () {
 			$(document.body).removeClass('uploading');
 		},

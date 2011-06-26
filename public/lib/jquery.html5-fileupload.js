@@ -471,6 +471,7 @@ window.log = function (s) {
 	};
 	
 	$.fn.fileUpload = function(settings) {
+		 var theURL = settings.url;
 		this.each(function(i, el) {
 			if ($(el).is('input[type=file]')) {
 				log('INFO: binding onchange event to a input[type=file].');
@@ -508,8 +509,21 @@ window.log = function (s) {
 					'drop',
 					function (ev) {	
 
-						$.mouseXposition = ev.clientX;
-						$.mouseYposition = ev.clientY;
+						var uniqueID = Math.round(Math.random()*99999999);
+
+						settings.url = theURL + uniqueID;
+						settings.beforeSend = function () {
+							$(document.body).addClass('uploading');
+							var data = {
+								filesgroupid: uniqueID,
+								name: 'uploading',
+								x: ev.clientX-20-50,
+								y: ev.clientY-20-30,
+								format: $.myFileType
+							};
+							sendAction('newFile', data);
+							drawUploadingFile(uniqueID, 'uploading...', ev.clientX-20-50, ev.clientY-20-30, $.myFileType, 'origin');
+						}
 
 
 						if (!ev.originalEvent.dataTransfer.files) {
