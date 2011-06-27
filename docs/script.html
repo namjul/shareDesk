@@ -1,0 +1,447 @@
+<!DOCTYPE html>  <html> <head>   <title>script.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               script.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Creating socket.io instance</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Socket</span><span class="p">();</span> 
+<span class="nx">socket</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>an action has happened, send it to the server</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">sendAction</span><span class="p">(</span><span class="nx">action</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;--&gt; &#39;</span> <span class="o">+</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+
+	<span class="kd">var</span> <span class="nx">message</span> <span class="o">=</span> <span class="p">{</span> 
+		<span class="nx">action</span><span class="o">:</span> <span class="nx">action</span><span class="p">,</span>
+		<span class="nx">data</span><span class="o">:</span> <span class="nx">data</span>
+	<span class="p">}</span>
+
+	<span class="nx">socket</span><span class="p">.</span><span class="nx">send</span> <span class="p">(</span> <span class="nx">message</span> <span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span> 
+	<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;successful socket.io connect&#39;</span><span class="p">);</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>let the path be the room name</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>imediately join the room which will trigger the initializations</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">sendAction</span><span class="p">(</span><span class="s1">&#39;joinRoom&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span> </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>alert("Server disconnected. Please reload page.");</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">});</span>
+
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span> 
+	<span class="nx">getMessage</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>respond to an action event</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">getMessage</span><span class="p">(</span> <span class="nx">m</span> <span class="p">)</span>
+<span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">message</span> <span class="o">=</span> <span class="nx">m</span><span class="p">;</span> 
+	<span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">message</span><span class="p">.</span><span class="nx">action</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">message</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+
+	<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;&lt;-- &#39;</span> <span class="o">+</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">m</span><span class="p">);</span>
+
+	<span class="k">switch</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">case</span> <span class="s1">&#39;roomAccept&#39;</span><span class="o">:</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>okay we're accepted, then request initialization</p>             </td>             <td class="code">               <div class="highlight"><pre>			<span class="nx">sendAction</span><span class="p">(</span><span class="s1">&#39;initializeMe&#39;</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+			
+		<span class="k">case</span> <span class="s1">&#39;initFiles&#39;</span><span class="o">:</span>
+			<span class="nx">initFiles</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;moveFile&#39;</span><span class="o">:</span>
+			<span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">animate</span><span class="p">({</span>
+				<span class="nx">left</span><span class="o">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">left</span><span class="o">+</span><span class="s2">&quot;px&quot;</span><span class="p">,</span>
+				<span class="nx">top</span><span class="o">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">top</span><span class="o">+</span><span class="s2">&quot;px&quot;</span> 
+			<span class="p">},</span> <span class="mi">500</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;initialUsers&#39;</span><span class="o">:</span>
+			<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;active users&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="nx">initialUsers</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;join-announce&#39;</span><span class="o">:</span>
+			<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;new User entered Desktop&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="nx">joinRoom</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;leave-announce&#39;</span><span class="o">:</span>
+			<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;User left desk&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="nx">leaveRoom</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;newFile&#39;</span><span class="o">:</span>
+			<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;newFile&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="nx">drawUploadingFile</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">filesgroupid</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">format</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;createFile&#39;</span><span class="o">:</span>
+			<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;createFile&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="nx">setUploadedFile</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">filesgroupid</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">file</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">file</span><span class="p">.</span><span class="nx">format</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;renameFile&#39;</span><span class="o">:</span>
+			<span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;h3&#39;</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;deleteFile&#39;</span><span class="o">:</span>
+			<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;deleteFile&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">case</span> <span class="s1">&#39;progress&#39;</span><span class="o">:</span>
+			<span class="nx">showProcess</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">filesgroupid</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">bytesReceived</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">bytesExpected</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+
+		<span class="k">default</span><span class="o">:</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>unknown message</p>             </td>             <td class="code">               <div class="highlight"><pre>			<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;unknows message&#39;</span><span class="p">,</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+
+
+<span class="p">}</span> </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h3>Just Drawing a new file</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">drawNewFile</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">format</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="kd">var</span> <span class="nx">fileID</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">formatValue</span> <span class="o">=</span> <span class="nx">format</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nx">format</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">));</span>
+	<span class="kd">var</span> <span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+
+	<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">format</span><span class="p">);</span>
+
+	<span class="k">switch</span><span class="p">(</span><span class="nx">formatValue</span><span class="p">)</span> <span class="p">{</span>
+
+		<span class="k">case</span> <span class="s1">&#39;video&#39;</span><span class="o">:</span> 
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;video&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;image&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;picture&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;text&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;audio&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;audio&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;application&#39;</span><span class="o">:</span>
+									<span class="k">if</span><span class="p">(</span><span class="nx">format</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="nx">format</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">)</span> <span class="p">{</span>
+										<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;pdf&#39;</span><span class="p">;</span>
+										<span class="k">break</span><span class="p">;</span>
+									<span class="p">}</span>
+		<span class="k">default</span><span class="o">:</span> 			<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+
+
+	<span class="kd">var</span> <span class="nx">fileHTML</span> <span class="o">=</span> <span class="s1">&#39;&lt;div id=&quot;&#39;</span> <span class="o">+</span> <span class="nx">fileID</span> <span class="o">+</span> <span class="s1">&#39;&quot; class=&quot;file draggable&quot;&gt;\</span>
+<span class="s1">										&lt;div class=&quot;operations&quot;&gt;\</span>
+<span class="s1">											&lt;a href=&quot;http://&#39;</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">host</span> <span class="o">+</span> <span class="s1">&#39;/download&#39;</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nx">fileID</span> <span class="o">+</span> <span class="s1">&#39;&quot; class=&quot;download&quot;&gt;download&lt;/a&gt;\</span>
+<span class="s1">											&lt;a href=&quot;#&quot; class=&quot;delete&quot;&gt;delete&lt;/a&gt;\</span>
+<span class="s1">										&lt;/div&gt;\</span>
+<span class="s1">										&lt;div class=&quot;format&quot;&gt;\</span>
+<span class="s1">											&lt;div class=&quot;image &#39;</span> <span class="o">+</span> <span class="nx">formatClass</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&lt;/div&gt;\</span>
+<span class="s1">										&lt;/div&gt;\</span>
+<span class="s1">										&lt;h3 class=&quot;title&quot;&gt;&#39;</span> <span class="o">+</span> <span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;&lt;/h3&gt;\</span>
+<span class="s1">									&lt;/div&gt;&#39;</span><span class="p">;</span>
+
+	<span class="kd">var</span> <span class="nx">$file</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">fileHTML</span><span class="p">);</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">appendTo</span><span class="p">(</span><span class="s1">&#39;#wrapper&#39;</span><span class="p">);</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">draggable</span><span class="p">();</span>
+
+	
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;display&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="nx">y</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">fadeIn</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">3000</span><span class="p">));</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>After a drag:</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">$file</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span> <span class="s2">&quot;dragstop&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">ui</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;dragstop&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+		<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">id</span><span class="o">:</span> <span class="nx">fileID</span><span class="p">,</span>
+			<span class="nx">position</span><span class="o">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">position</span><span class="p">,</span>
+			<span class="nx">oldposition</span><span class="o">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">originalPosition</span><span class="p">,</span>
+		<span class="p">};</span>
+		<span class="nx">sendAction</span><span class="p">(</span><span class="s1">&#39;moveFile&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+	<span class="p">});</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>when user press delete button</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;.delete&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span>	<span class="kd">function</span><span class="p">(){</span>
+			<span class="nx">$file</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>notify server of delete</p>             </td>             <td class="code">               <div class="highlight"><pre>			<span class="nx">sendAction</span><span class="p">(</span> <span class="s1">&#39;deleteFile&#39;</span> <span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="o">:</span> <span class="nx">fileID</span> <span class="p">});</span>
+		<span class="p">}</span>
+	<span class="p">);</span>
+	</pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>rename files</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;h3&#39;</span><span class="p">).</span><span class="nx">editable</span><span class="p">(</span> <span class="nx">onFileChange</span><span class="p">,</span>
+		<span class="p">{</span>
+			<span class="nx">style</span>   <span class="o">:</span> <span class="s1">&#39;inherit&#39;</span><span class="p">,</span>
+			<span class="nx">cssclass</span>   <span class="o">:</span> <span class="s1">&#39;file-edit-form&#39;</span><span class="p">,</span>
+			<span class="nx">type</span>      <span class="o">:</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+			<span class="nx">onblur</span><span class="o">:</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+			<span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;dblclick&#39;</span>						
+		<span class="p">}</span>
+	<span class="p">);</span>
+
+	<span class="kd">function</span> <span class="nx">onFileChange</span><span class="p">(</span> <span class="nx">text</span><span class="p">,</span> <span class="nx">result</span> <span class="p">)</span> <span class="p">{</span>
+
+		<span class="kd">var</span> <span class="nx">input</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form.&#39;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">.</span><span class="nx">cssclass</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+		<span class="kd">var</span> <span class="nx">original</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">val</span><span class="p">();</span>
+		<span class="kd">var</span> <span class="nx">newtext</span> <span class="o">=</span> <span class="nx">text</span><span class="p">;</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form.file-edit-form&#39;</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
+		<span class="nx">sendAction</span><span class="p">(</span><span class="s1">&#39;renameFile&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">fileID</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="nx">text</span> <span class="p">});</span>
+		<span class="k">return</span><span class="p">(</span><span class="nx">newtext</span><span class="p">);</span>
+	<span class="p">}</span>	
+
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <h3>Show uploading file</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">drawUploadingFile</span><span class="p">(</span><span class="nx">filesgroupid</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">format</span><span class="p">,</span> <span class="nx">isOrigin</span><span class="p">)</span> <span class="p">{</span>
+	
+	<span class="k">if</span><span class="p">(</span><span class="nx">isOrigin</span> <span class="o">==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="nx">isOrigin</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+
+	<span class="kd">var</span> <span class="nx">FileGroupId</span> <span class="o">=</span> <span class="nx">filesgroupid</span><span class="p">;</span>
+
+
+	<span class="kd">var</span> <span class="nx">formatValue</span> <span class="o">=</span> <span class="nx">format</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nx">format</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">));</span>
+	<span class="kd">var</span> <span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+
+	<span class="k">switch</span><span class="p">(</span><span class="nx">formatValue</span><span class="p">)</span> <span class="p">{</span>
+
+		<span class="k">case</span> <span class="s1">&#39;video&#39;</span><span class="o">:</span> 
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;video&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;image&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;picture&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;text&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;audio&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;audio&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;application&#39;</span><span class="o">:</span>
+									<span class="k">if</span><span class="p">(</span><span class="nx">format</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="nx">format</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">)</span> <span class="p">{</span>
+										<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;pdf&#39;</span><span class="p">;</span>
+										<span class="k">break</span><span class="p">;</span>
+									<span class="p">}</span>
+		<span class="k">default</span><span class="o">:</span> 			<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="kd">var</span> <span class="nx">fileHTML</span> <span class="o">=</span> <span class="s1">&#39;&lt;div class=&quot;file draggable &#39;</span> <span class="o">+</span> <span class="nx">filesgroupid</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nx">isOrigin</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;\</span>
+<span class="s1">										&lt;div class=&quot;operations&quot;&gt;\</span>
+<span class="s1">										&lt;/div&gt;\</span>
+<span class="s1">										&lt;div class=&quot;format&quot;&gt;\</span>
+<span class="s1">											&lt;div class=&quot;image &#39;</span> <span class="o">+</span> <span class="nx">formatClass</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&lt;/div&gt;\</span>
+<span class="s1">											&lt;div class=&quot;progress&quot;&gt;\</span>
+<span class="s1">												&lt;div class=&quot;progressBack&quot;&gt;&lt;/div&gt;\</span>
+<span class="s1">												&lt;div class=&quot;progressPercent&quot;&gt;\</span>
+<span class="s1">													&lt;div class=&quot;progressCenter&quot;&gt;\</span>
+<span class="s1">														&lt;span&gt;&lt;/span&gt;\</span>
+<span class="s1">													&lt;/div&gt;\</span>
+<span class="s1">												&lt;/div&gt;\</span>
+<span class="s1">											&lt;/div&gt;\</span>
+<span class="s1">										&lt;/div&gt;\</span>
+<span class="s1">										&lt;h3 class=&quot;title&quot;&gt;&#39;</span><span class="o">+</span><span class="nx">name</span><span class="o">+</span><span class="s1">&#39;&lt;/h3&gt;\</span>
+<span class="s1">									&lt;/div&gt;&#39;</span><span class="p">;</span>
+
+
+	<span class="kd">var</span> <span class="nx">$file</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">fileHTML</span><span class="p">);</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="nx">y</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">appendTo</span><span class="p">(</span><span class="s1">&#39;#wrapper&#39;</span><span class="p">);</span>
+
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <h3>Set file when upload has completed</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">setUploadedFile</span><span class="p">(</span><span class="nx">filesgroupid</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">format</span><span class="p">)</span> <span class="p">{</span>
+	
+	<span class="kd">var</span> <span class="nx">$file</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="nx">filesgroupid</span><span class="p">);</span>
+	<span class="kd">var</span> <span class="nx">fileID</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+
+	<span class="kd">var</span> <span class="nx">formatValue</span> <span class="o">=</span> <span class="nx">format</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nx">format</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">));</span>
+	<span class="kd">var</span> <span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+
+	<span class="k">switch</span><span class="p">(</span><span class="nx">formatValue</span><span class="p">)</span> <span class="p">{</span>
+
+		<span class="k">case</span> <span class="s1">&#39;video&#39;</span><span class="o">:</span> 
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;video&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;image&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;picture&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;text&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;audio&#39;</span><span class="o">:</span>
+									<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;audio&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="s1">&#39;application&#39;</span><span class="o">:</span>
+									<span class="k">if</span><span class="p">(</span><span class="nx">format</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="nx">format</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;pdf&#39;</span><span class="p">)</span> <span class="p">{</span>
+										<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;pdf&#39;</span><span class="p">;</span>
+										<span class="k">break</span><span class="p">;</span>
+									<span class="p">}</span>
+		<span class="k">default</span><span class="o">:</span> 			<span class="nx">formatClass</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span><span class="p">;</span>
+									<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="kd">var</span> <span class="nx">$fileFormat</span> <span class="o">=</span> <span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;.image&#39;</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="nx">$fileFormat</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="s1">&#39;unknown&#39;</span><span class="p">))</span> <span class="p">{</span>
+		<span class="nx">$fileFormat</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;unknown&#39;</span><span class="p">);</span>
+		<span class="nx">$fileFormat</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="nx">formatClass</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span><span class="p">(</span><span class="nx">$file</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="s2">&quot;origin&quot;</span><span class="p">))</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">id</span><span class="o">:</span> <span class="nx">fileID</span><span class="p">,</span>
+			<span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
+				<span class="nx">top</span><span class="o">:</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">$file</span><span class="p">.</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">)),</span>
+				<span class="nx">left</span><span class="o">:</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">$file</span> <span class="p">.</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">))</span>
+			<span class="p">},</span>
+		<span class="p">};</span>
+		<span class="nx">sendAction</span><span class="p">(</span><span class="s1">&#39;moveFile&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="nx">filesgroupid</span><span class="p">);</span>
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="nx">fileID</span><span class="p">);</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;h3&#39;</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;.progress&#39;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>	
+	<span class="p">});</span>
+
+	<span class="kd">var</span> <span class="nx">fileHTML</span> <span class="o">=</span> <span class="s1">&#39;&lt;a href=&quot;http://&#39;</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">host</span> <span class="o">+</span> <span class="s1">&#39;/download&#39;</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nx">fileID</span> <span class="o">+</span> <span class="s1">&#39;&quot; class=&quot;download&quot;&gt;download&lt;/a&gt;&lt;a href=&quot;#&quot; class=&quot;delete&quot;&gt;delete&lt;/a&gt;&#39;</span><span class="p">;</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;div.operations&#39;</span><span class="p">).</span><span class="nx">prepend</span><span class="p">(</span><span class="nx">fileHTML</span><span class="p">);</span>
+
+	<span class="nx">$file</span><span class="p">.</span><span class="nx">draggable</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <p>After a drag:</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">$file</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span> <span class="s2">&quot;dragstop&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">ui</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;dragstop&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+		<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">id</span><span class="o">:</span> <span class="nx">fileID</span><span class="p">,</span>
+			<span class="nx">position</span><span class="o">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">position</span><span class="p">,</span>
+			<span class="nx">oldposition</span><span class="o">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">originalPosition</span><span class="p">,</span>
+		<span class="p">};</span>
+		<span class="nx">sendAction</span><span class="p">(</span><span class="s1">&#39;moveFile&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+	<span class="p">});</span></pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <p>when user press delete button</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;.delete&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span>	<span class="kd">function</span><span class="p">(){</span>
+			<span class="nx">$file</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <p>notify server of delete</p>             </td>             <td class="code">               <div class="highlight"><pre>			<span class="nx">sendAction</span><span class="p">(</span> <span class="s1">&#39;deleteFile&#39;</span> <span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="o">:</span> <span class="nx">fileID</span> <span class="p">});</span>
+		<span class="p">}</span>
+	<span class="p">);</span>
+	</pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <p>rename files</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">$file</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;h3&#39;</span><span class="p">).</span><span class="nx">editable</span><span class="p">(</span> <span class="nx">onFileChange</span><span class="p">,</span>
+		<span class="p">{</span>
+			<span class="nx">style</span>   <span class="o">:</span> <span class="s1">&#39;inherit&#39;</span><span class="p">,</span>
+			<span class="nx">cssclass</span>   <span class="o">:</span> <span class="s1">&#39;file-edit-form&#39;</span><span class="p">,</span>
+			<span class="nx">type</span>      <span class="o">:</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+			<span class="nx">onblur</span><span class="o">:</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+			<span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;dblclick&#39;</span><span class="p">,</span>			
+		<span class="p">}</span>
+	<span class="p">);</span>
+
+	<span class="kd">function</span> <span class="nx">onFileChange</span><span class="p">(</span> <span class="nx">text</span><span class="p">,</span> <span class="nx">result</span> <span class="p">)</span> <span class="p">{</span>
+
+		<span class="kd">var</span> <span class="nx">input</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form.&#39;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">.</span><span class="nx">cssclass</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+		<span class="kd">var</span> <span class="nx">original</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">val</span><span class="p">();</span>
+		<span class="kd">var</span> <span class="nx">newtext</span> <span class="o">=</span> <span class="nx">text</span><span class="p">;</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form.file-edit-form&#39;</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
+		<span class="nx">sendAction</span><span class="p">(</span><span class="s1">&#39;renameFile&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">fileID</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="nx">text</span> <span class="p">});</span>
+		<span class="k">return</span><span class="p">(</span><span class="nx">newtext</span><span class="p">);</span>
+	<span class="p">}</span>	
+
+
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-21">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-21">&#182;</a>               </div>               <h3>Show Process of files</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">showProcess</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">bytesReceived</span><span class="p">,</span> <span class="nx">bytesExpected</span><span class="p">)</span> <span class="p">{</span>
+	
+	<span class="kd">var</span> <span class="nx">percent</span> <span class="o">=</span> <span class="p">((</span><span class="nx">bytesReceived</span><span class="o">/</span><span class="nx">bytesExpected</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">3</span><span class="p">));</span>
+
+	
+	<span class="kd">var</span> <span class="nx">newHeight</span> <span class="o">=</span> <span class="p">(((</span><span class="o">-</span><span class="nx">percent</span><span class="o">*</span><span class="mi">46</span><span class="p">)</span> <span class="o">%</span> <span class="mi">46</span><span class="p">)</span> <span class="o">+</span> <span class="mi">46</span><span class="p">)</span> <span class="o">%</span> <span class="mi">46</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">newOpacity</span> <span class="o">=</span> <span class="p">((</span><span class="o">-</span><span class="nx">percent</span><span class="o">*</span><span class="mi">100</span> <span class="o">%</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="mi">100</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">;</span>
+
+	<span class="k">if</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="nx">id</span><span class="p">).</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">drawUploadingFile</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="s1">&#39;uploading...&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">);</span>	
+	<span class="p">}</span>
+
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s1">&#39; .progressPercent span&#39;</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="nx">percent</span><span class="p">));</span>
+	
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s1">&#39; .progressBack&#39;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="nx">newHeight</span><span class="p">);</span>
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s1">&#39; .progressBack&#39;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;opacity&#39;</span><span class="p">,</span> <span class="nx">newOpacity</span><span class="o">/</span><span class="mi">100</span><span class="p">);</span>
+
+
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-22">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-22">&#182;</a>               </div>               <h2>Join/leave desktop</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">sids_users</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">();</span>
+<span class="kd">function</span> <span class="nx">initialUsers</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="k">for</span> <span class="p">(</span><span class="nx">user</span> <span class="k">in</span> <span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#activeUser&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;&lt;li id=&quot;&#39;</span><span class="o">+</span><span class="nx">users</span><span class="p">[</span><span class="nx">user</span><span class="p">].</span><span class="nx">sid</span><span class="o">+</span><span class="s1">&#39;&quot; style=&quot;background:&#39;</span><span class="o">+</span><span class="nx">getRandomColor</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;;&quot;&gt;&lt;/li&gt;&#39;</span><span class="p">);</span>
+		<span class="nx">sids_users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">users</span><span class="p">[</span><span class="nx">user</span><span class="p">].</span><span class="nx">sid</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#activeUser&#39;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;li&#39;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="o">/</span><span class="nx">users</span><span class="p">.</span><span class="nx">length</span><span class="o">+</span><span class="s1">&#39;%&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">joinRoom</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#activeUser&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;&lt;li id=&quot;&#39;</span><span class="o">+</span><span class="nx">user</span><span class="p">.</span><span class="nx">sid</span><span class="o">+</span><span class="s1">&#39;&quot; style=&quot;background:&#39;</span><span class="o">+</span><span class="nx">getRandomColor</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;;&quot;&gt;&lt;/li&gt;&#39;</span><span class="p">);</span>
+	<span class="nx">sids_users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">sid</span><span class="p">);</span>
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#activeUser&#39;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;li&#39;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="o">/</span><span class="nx">sids_users</span><span class="p">.</span><span class="nx">length</span><span class="o">+</span><span class="s1">&#39;%&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">leaveRoom</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#activeUser&#39;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="o">+</span><span class="nx">user</span><span class="p">.</span><span class="nx">sid</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
+	<span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+	<span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;=</span><span class="nx">sids_users</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">sid</span> <span class="o">==</span> <span class="nx">sids_users</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="p">{</span>
+			<span class="nx">sids_users</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#activeUser&#39;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;li&#39;</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="o">/</span><span class="nx">sids_users</span><span class="p">.</span><span class="nx">length</span><span class="o">+</span><span class="s1">&#39;%&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">getRandomColor</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">letters</span> <span class="o">=</span> <span class="s1">&#39;0123456789ABCDEF&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+	<span class="kd">var</span> <span class="nx">color</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span><span class="p">;</span>
+	<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+			<span class="nx">color</span> <span class="o">+=</span> <span class="nx">letters</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">15</span><span class="p">)];</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">color</span><span class="p">;</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-23">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-23">&#182;</a>               </div>               <h3>first time init files</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">initFiles</span><span class="p">(</span> <span class="nx">fileArray</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">fileArray</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">file</span> <span class="o">=</span> <span class="nx">fileArray</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+		<span class="nx">drawNewFile</span><span class="p">(</span><span class="nx">file</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span> <span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">file</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">file</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span> <span class="nx">file</span><span class="p">.</span><span class="nx">format</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-24">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-24">&#182;</a>               </div>               <h2>Init Drag&amp;Drop</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">initDnD</span><span class="p">()</span> <span class="p">{</span>
+
+	<span class="kd">var</span> <span class="nx">dropbox</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;wrapper&quot;</span><span class="p">);</span></pre></div>             </td>           </tr>                               <tr id="section-25">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-25">&#182;</a>               </div>               <p>init event handlers</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">dropbox</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;dragenter&quot;</span><span class="p">,</span> <span class="nx">dragEnter</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+	<span class="nx">dropbox</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;dragexit&quot;</span><span class="p">,</span> <span class="nx">dragExit</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+	<span class="nx">dropbox</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;dragover&quot;</span><span class="p">,</span> <span class="nx">dragOver</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+	<span class="nx">dropbox</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;drop&quot;</span><span class="p">,</span> <span class="nx">drop</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">dragEnter</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-26">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-26">&#182;</a>               </div>               <p>sign an drag    </p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">dragExit</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">dragOver</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">drop</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
+	<span class="nx">evt</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-27">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-27">&#182;</a>               </div>               <p>Get the dropped files.</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="kd">var</span> <span class="nx">files</span> <span class="o">=</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">dataTransfer</span><span class="p">.</span><span class="nx">files</span><span class="p">;</span>
+	</pre></div>             </td>           </tr>                               <tr id="section-28">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-28">&#182;</a>               </div>               <p>If anything is wrong with the dropped files, exit.</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">files</span> <span class="o">==</span> <span class="s2">&quot;undefined&quot;</span> <span class="o">||</span> <span class="nx">files</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-29">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-29">&#182;</a>               </div>               <p>Start Upload</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">uploader</span><span class="p">.</span><span class="nx">startUpload</span><span class="p">(</span><span class="nx">files</span><span class="p">);</span>
+	
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">initBrowserWarning</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">isChrome</span> <span class="o">=</span> <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;chrome&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">isFirefox</span> <span class="o">=</span> <span class="nx">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;firefox&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	
+	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">isChrome</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">isFirefox</span><span class="p">)</span>
+		<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;no browser support for drag&amp;drop upload&#39;</span><span class="p">);</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-30">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-30">&#182;</a>               </div>               <p>Gloabl variables</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">uploader</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-31">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-31">&#182;</a>               </div>               <h2>jQuery DOM Ready</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+	</pre></div>             </td>           </tr>                               <tr id="section-32">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-32">&#182;</a>               </div>               <p>Upload script html5Uploader jQuery Plugin</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-33">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-33">&#182;</a>               </div>               <p>Detector demo</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">$</span><span class="p">.</span><span class="nx">fileUploadSupported</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;not_supported&#39;</span><span class="p">);</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#detector&#39;</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="s1">&#39;This browser is NOT supported.&#39;</span><span class="p">);</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#detector&#39;</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="s1">&#39;This browser is supported.&#39;</span><span class="p">);</span>
+	<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-34">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-34">&#182;</a>               </div>               <p>Enable plug-in</p>             </td>             <td class="code">               <div class="highlight"><pre>	<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#wrapper&#39;</span><span class="p">).</span><span class="nx">fileUpload</span><span class="p">(</span> <span class="p">{</span>
+		<span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/upload&#39;</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+		<span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+		<span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+		<span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+			<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;uploading&#39;</span><span class="p">);</span>
+		<span class="p">},</span>
+		<span class="nx">success</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nb">window</span><span class="p">.</span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Server error.&#39;</span><span class="p">);</span>
+				<span class="k">return</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">error</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nb">window</span><span class="p">.</span><span class="nx">alert</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
+				<span class="k">return</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="nb">window</span><span class="p">.</span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Success! You have sent a file named \&#39;&#39;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;\&#39; with MIME type \&#39;&#39;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">.</span><span class="nx">type</span> <span class="o">+</span> <span class="s1">&#39;\&#39;.&#39;</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">});</span>
+	
+	
+<span class="p">});</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,7 +1,4 @@
 
-///////////////////////////////////////////
-//            SOCKET.IO STUFF            //
-///////////////////////////////////////////
 //Creating socket.io instance
 var socket = new io.Socket(); 
 socket.connect();
@@ -41,7 +38,7 @@ socket.on('message', function(data){
 //respond to an action event
 function getMessage( m )
 {
-	var message = m; //JSON.parse(m);
+	var message = m; 
 	var action = message.action;
 	var data = message.data;
 
@@ -51,12 +48,7 @@ function getMessage( m )
 	{
 		case 'roomAccept':
 			//okay we're accepted, then request initialization
-			//(this is a bit of unnessary back and forth but that's okay for now)
 			sendAction('initializeMe', null);
-			break;
-
-		case 'roomDeny':
-			//this doesn't happen yet
 			break;
 			
 		case 'initFiles':
@@ -70,8 +62,19 @@ function getMessage( m )
 			}, 500);
 			break;
 
+		case 'initialUsers':
+			console.log('active users', data);
+			initialUsers(data);
+			break;
+
 		case 'join-announce':
 			console.log('new User entered Desktop', data);
+			joinRoom(data);
+			break;
+
+		case 'leave-announce':
+			console.log('User left desk', data);
+			leaveRoom(data);
 			break;
 
 		case 'newFile':
@@ -107,17 +110,10 @@ function getMessage( m )
 } 
 
 
-//----------------------------------
-// Just Drawing a new file
-//----------------------------------
+// ###Just Drawing a new file
 function drawNewFile(id, name, x, y, format) {
 
 	var fileID = id;
-/*
-	if(name.length > 14) {
-		nameShortend = name.substr(0, 14) + '..';
-	} */
-
 	var formatValue = format.substr(0,format.indexOf('/'));
 	var formatClass = '';
 
@@ -205,12 +201,6 @@ function drawNewFile(id, name, x, y, format) {
 		var input = $('form.' + result.cssclass).find('input');
 		var original = input.val();
 		var newtext = text;
-		/*
-		if(original.length > 30) {
-			newtext = text.substr(0, 30) + '..';
-		} else {
-			newtext = original;
-		}*/
 		$('form.file-edit-form').remove();
 		sendAction('renameFile', { id: fileID, value: text });
 		return(newtext);
@@ -218,9 +208,7 @@ function drawNewFile(id, name, x, y, format) {
 
 }
 
-//----------------------------------
-// Show uploading file
-//----------------------------------
+// ###Show uploading file
 function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 	
 	if(isOrigin == undefined) isOrigin = '';
@@ -280,9 +268,7 @@ function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 
 }
 
-//----------------------------------
-// Set file when upload has completed
-//----------------------------------
+// ###Set file when upload has completed
 function setUploadedFile(filesgroupid, id, name, format) {
 	
 	var $file = $('.'+filesgroupid);
@@ -334,11 +320,6 @@ function setUploadedFile(filesgroupid, id, name, format) {
 	$file.removeClass(filesgroupid);
 	$file.attr('id', fileID);
 
-/*
-	if(name.length > 14) {
-		name = name.substr(0, 14) + '..';
-	} */
-
 	$file.find('h3').text(name);
 
 	$file.find('.progress').fadeOut(function() {
@@ -387,12 +368,6 @@ function setUploadedFile(filesgroupid, id, name, format) {
 		var input = $('form.' + result.cssclass).find('input');
 		var original = input.val();
 		var newtext = text;
-		/*
-		if(original.length > 30) {
-			newtext = text.substr(0, 30) + '..';
-		} else {
-			newtext = original;
-		}*/
 		$('form.file-edit-form').remove();
 		sendAction('renameFile', { id: fileID, value: text });
 		return(newtext);
@@ -402,9 +377,7 @@ function setUploadedFile(filesgroupid, id, name, format) {
 }
 
 
-//----------------------------------
-// Show Process of files 
-//----------------------------------
+// ###Show Process of files 
 function showProcess(id, bytesReceived, bytesExpected) {
 	
 	var percent = ((bytesReceived/bytesExpected).toFixed(3));
@@ -425,9 +398,46 @@ function showProcess(id, bytesReceived, bytesExpected) {
 
 }
 
-//----------------------------------
-// first time init files
-//----------------------------------
+// ##Join/leave desktop
+var sids_users = new Array();
+function initialUsers(users) {
+
+	for (user in users) {
+		$('#activeUser').append('<li id="'+users[user].sid+'" style="background:'+getRandomColor()+';"></li>');
+		sids_users.push(users[user].sid);
+	}
+
+	$('#activeUser').find('li').css('width', 100/users.length+'%');
+}
+
+function joinRoom(user) {
+	$('#activeUser').append('<li id="'+user.sid+'" style="background:'+getRandomColor()+';"></li>');
+	sids_users.push(user.sid);
+	$('#activeUser').find('li').css('width', 100/sids_users.length+'%');
+}
+
+function leaveRoom(user) {
+	$('#activeUser').find('#'+user.sid).remove();
+	var i=0;
+	for (i=0;i<=sids_users.length;i++){
+		if(user.sid == sids_users[i]) {
+			sids_users.splice(i,1);
+		}
+	}
+	$('#activeUser').find('li').css('width', 100/sids_users.length+'%');
+}
+
+function getRandomColor() {
+	var letters = '0123456789ABCDEF'.split('');
+	var color = '#';
+	for (var i = 0; i < 6; i++ ) {
+			color += letters[Math.round(Math.random() * 15)];
+	}
+	return color;
+}
+
+
+// ###first time init files
 function initFiles( fileArray ) {
 	for (i in fileArray) {
 		file = fileArray[i];
@@ -435,223 +445,7 @@ function initFiles( fileArray ) {
 	}
 }
 
-///////////////////////////////////////////
-//            Drag&Drop STUFF            //
-///////////////////////////////////////////
-
-//----------------------------------
-// Uploader 
-//----------------------------------
-
-/**
-* @param Event Object from FileReader on onloaded
-*/
-var Uploader = function() {
-	
-};
-
-Uploader.prototype = {
-
-		/**
-     * Array of all files
-		 * * */
-		elements: [],
-
-		 /**
-     * Fills the elements array with the files data
-		 * * */
-    startUpload: function(files) {
-
-				this.elements = [];
-
-			//count how many files FileReader has passed
-			var readFiles = 0;
-			
-			// Process each of the dropped files individually
-			for(var i = 0, length = files.length; i < length; i++) {
-				
-				var reader = new FileReader(),
-						file = files[i],
-						self = this;
-
-				// Handle errors that might occur while reading the file (before upload).
-				reader.onerror = function(evt) {
-					var message;
-					// REF: http://www.w3.org/TR/FileAPI/#ErrorDescriptions
-					switch(evt.target.error.code) {
-						case 1:
-							message = file.name + " not found.";
-							break;
-						case 2:
-							message = file.name + " has changed on disk, please re-try.";
-							break;
-						case 3:
-							messsage = "Upload cancelled.";
-							break;
-						case 4:
-							message = "Cannot read " + file.name + ".";
-							break;
-						case 5:
-							message = "File too large for browser to upload.";
-							break;
-					}
-					console.log(message);	
-				}
-
-				// When the file is done loading, POST to the server.
-				reader.onloadend = function(evt){
-
-					var data = evt.target.result;
-					
-					self.elements.push({name:file.name, size:file.size, type:file.type, data: data});
-						
-					
-					if(data.length > 128){
-						var base64StartIndex = data.indexOf(',') + 1;
-						if(base64StartIndex < data.length) {
-							self.elements.push({name:file.name, size:file.size, type:file.type, data: data.substring(base64StartIndex) });
-						}
-					} 
-
-					//If all Files are read start sending them
-					if (++readFiles == files.length) {
-       	 		self.send();
-     			}
-					
-				}
-
-				// init the reader event handlers
-				//reader.onprogress = handleReaderProgress;
-				//reader.onloadend = handleReaderLoadEnd;
-
-				// begin the read operation
-				reader.readAsDataURL(file);
-
-			}
-
-		},
-
-    /**
-     * @param Object HTTP headers to send to the server, the key is the
-     * header name, the value is the header value
-     */
-    headers : {},
-
-    /**
-     * @return String A random string
-     */
-    generateBoundary: function() {
-			return "-----------------------" + (new Date).getTime();	
-		},
-
-    /**
-     * Constructs the message as discussed in the section about form
-     * data transmission over HTTP
-     *
-     * @param Array elements
-     * @param String boundary
-     * @return String
-     */
-    buildMessage : function() {
-			
-			var CRLF = "\r\n";
-   		var parts = [];
-			var boundary = this.generateBoundary();				
-
-			this.elements.forEach(function(element, index, all) {
-
-				var part = "";
-				
-				var fieldName = 'upload';
-
-				/*
-				 * Content-Disposition header contains name of the field
-				 * used to upload the file and also the name of the file as
-				 * it was on the user's computer.
-				 */
-				part += 'Content-Disposition: form-data; ';
-				part += 'name="' + fieldName + '"; ';
-				part += 'filename="'+ element.name + '"' + CRLF;
-				
-				/*
-				 * Content-Type header contains the mime-type of the file
-				 * to send. Although we could build a map of mime-types
-				 * that match certain file extensions, we'll take the easy
-				 * approach and send a general binary header:
-				 * application/octet-stream
-				 */
-				part += "Content-Type: " + element.type;
-				part += CRLF + CRLF; // marks end of the headers part
-				
-				/*
-				* Field value
-				*/
-				part += element.data + CRLF;
-
-				parts.push(part);
-				
-			});
-
-			var request = "--" + boundary + CRLF;
-      request+= parts.join("--" + boundary + CRLF);
-      request+= "--" + boundary + "--" + CRLF;
-
-    	return request;
-    				
-		},
-
-    /**
-     * @return null
-     */
-    send : function() {
-			
-			var boundary = this.generateBoundary(),
-					contentType = "multipart/form-data; boundary=" + boundary,
-					uniqueID = Math.round(Math.random()*99999999);
-			
-			$.ajax({
-				type: 'POST',
-				url: '/upload' + location.pathname + '/' + uniqueID,
-				data: this.buildMessage(), // Just send the Base64 content in POST body
-				processData: false,
-				timeout: 60000, // 1 min timeout
-				dataType: 'text', // Pure Base64 char data
-				contentType: null,
-				contentType: contentType,
-				beforeSend: function onBeforeSend(xhr, settings) {
-					// Put the important file data in headers
-						xhr.setRequestHeader('Content-Type', contentType);
-
-						xhr.send = xhr.sendAsBinary;
-					
-					// Update status
-					console.log('Uploading and Processing  + file.name + ...');
-				},
-				error: function (xhr,err) {
-
-					console.log("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
-   			  console.log("responseText: "+xhr.responseText);
-									},
-				success: function onUploadComplete(response) {
-					//response = $.parseJSON(response);
-
-					console.log(response);
-						
-					// If the parse operation failed (for whatever reason) bail
-					if(!response || typeof response == "undefined") {
-						// Error, update the status with a reason as well.
-						console.log('The server was unable to process the upload.');
-						return;
-					}						
-				}
-			}); 
-
-		}
-};
-
-//----------------------------------
-// Init Drag&Drop 
-//----------------------------------
+// ##Init Drag&Drop 
 
 function initDnD() {
 
@@ -708,22 +502,10 @@ function initBrowserWarning() {
 //Gloabl variables
 uploader = null;
 
-///////////////////////////////////////////
-//           jQuery DOM Ready            //
-///////////////////////////////////////////
+// ##jQuery DOM Ready   
 $(function() {
 	
-	/*
-	uploader = new Uploader();
-
-	//Init Drag&Drop Upload
-	initBrowserWarning();
-	initDnD();
-	*/
-
-	//----------------------------------
 	// Upload script html5Uploader jQuery Plugin
-	//----------------------------------
 
 	// Detector demo
 	if (!$.fileUploadSupported) {
@@ -733,8 +515,6 @@ $(function() {
 		$('#detector').text('This browser is supported.');
 	}
 
-
-	//var uniqueID = Math.round(Math.random()*99999999);
 	// Enable plug-in
 	$('#wrapper').fileUpload( {
 		url: '/upload' + location.pathname + '/',
