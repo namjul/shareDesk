@@ -12,6 +12,7 @@ var connect = require('connect'),
 	port = (process.env.PORT || 8081),
 	rooms	= require('./logics/rooms.js'),
 	formidable = require('formidable'),
+	path = require('path'),
 	fs = require('fs');
 
        
@@ -105,25 +106,26 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 			console.log("getFile error", error);
 		}
 		else {
-			if(typeof file != 'undefined') {
-
+			path.exists('./' + file.location, function(exists) {
+				if(!exists || !file) {
+					res.render('brokenfile.jade', {
+						locals: {pageTitle: ('shareDesk - ' + req.params.deskname) }
+					});
+					return;
+				}
+	
 				// HTTP Header
 				res.writeHead('200', {
 					'Content-Type' : file.type,
-					'Content-Disposition' : 'attachment;filename=' + file.name
+					'Content-Disposition' : 'attachment;filename=' + file.name,
+					'Content-Length' : fs.statSync('./' + file.location).size,
 				});
 						
 				// Filestream		
 				fs.createReadStream('./' + file.location, {
 					'bufferSize': 4 * 1024
 				}).pipe(res);
-
-			}
-			else {
-				console.log("cannot read file");
-				res.writeHead('404');
-				res.end();
-			}
+			});
 		}
 	});
 });
@@ -167,6 +169,15 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 			rooms.broadcast_room(req.params.deskname, msg);
 			oldProgressPercentage = newProgressPercentage;
 		}
+	});
+
+	form.on('aborted', function(error) {
+		console.log("-------------------------------error");
+		console.log(error);
+	});
+
+	form.on('end', function() {
+		console.log("end");
 	});
 
 	// uploading file done, save to db
