@@ -1,7 +1,9 @@
+//     sharedesk.js 0.1.x
+//     (c) 2010 Samuel Hobl, Alexander Kumbeiz, Goran Janosevic.
 
-///////////////////////////////////////////
-//           SETUP Dependencies          //
-///////////////////////////////////////////
+// Initial Setup Dependencies
+// -------------
+
 var connect = require('connect'),
 	express = require('express'),
 	mongoStore = require('connect-mongodb'),
@@ -13,53 +15,50 @@ var connect = require('connect'),
 	fs = require('fs');
 
        
-///////////////////////////////////////////
-//             SETUP Express             //
-///////////////////////////////////////////
+// Setup Express
+// -------------
 var app = module.exports = express.createServer();
 app.rooms = rooms;
 
 app.configure(function() {
-	//views is the default folder already
-  	app.set('views', __dirname + '/views');
-  	app.set('view engine', 'jade');
-  	app.use(express.bodyParser());
+ 	app.set('views', __dirname + '/views');
+ 	app.set('view engine', 'jade');
+ 	app.use(express.bodyParser());
 	app.use(express.cookieParser());
-	
 	app.use(express.session({ store: mongoStore(app.set('db-uri')), secret: 'keyboard cat'}));
-  	app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
-  	app.use(app.router);
-  	app.use(express.static(__dirname + '/public'));
+  app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
+  app.use(app.router);
+  app.use(express.static(__dirname + '/public'));
 });
 
+
 // node environment, use in terminal: "export NODE_ENV=production"
+//NODE_ENV=test
 app.configure('test', function() {
 	app.set('db-uri', 'mongodb://localhost/sharedesk-test');
 	app.model = new model('sharedesk-test', function() {});
 });
-
+//NODE_ENV=development
 app.configure('development', function() {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 	app.set('db-uri', 'mongodb://localhost/sharedesk-development');
 	app.model = new model('sharedesk-development', function() {});
 });
-
+//NODE_ENV=production
 app.configure('production', function() {
 	app.set('db-uri', 'mongodb://localhost/sharedesk-production');
 	app.model = new model('sharedesk-production', function() {});
 });
 
 
-///////////////////////////////////////////
-//            ERROR Handling             //
-///////////////////////////////////////////
-
+// Error handling
+// -------------
 function NotFound(msg) {
   	this.name = 'NotFound';
   	Error.call(this, msg);
   	Error.captureStackTrace(this, arguments.callee);
 }
-
+// extend from Error Object
 util.inherits(NotFound, Error);
 
 // Not Found Page
@@ -86,12 +85,10 @@ app.error(function(error, req, res, next) {
   	}
 });
 
-///////////////////////////////////////////
-//           ROUTES Controller           //
-///////////////////////////////////////////
+// Routes
+// -------------
 
-
-// Home directory, create desk
+// Home directory
 app.get('/', function(req, res){
 	res.render('home', {
 		layout: false
@@ -117,20 +114,9 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 				});
 						
 				// Filestream		
-				/*var read_stream = fs.createReadStream('./' + file.location);
-				read_stream.on("data", function(data){
-					res.write(data);
-				});*/
 				fs.createReadStream('./' + file.location, {
 					'bufferSize': 4 * 1024
-				}).pipe(res);/*
-				read_stream.on("error", function(err){
-					console.error("An error occurred: %s", err)
-				});
-				read_stream.on("close", function(){
-					res.end();
-					console.log("File closed.")
-				});*/
+				}).pipe(res);
 
 			}
 			else {
@@ -171,7 +157,7 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 		var newProgressPercentage = (bytesReceived / bytesExpected) * 100 | 0;
 		if(oldProgressPercentage < newProgressPercentage) {
 			var msg = {
-				action: 'progress',																																																																																																																																																																																												
+				action: 'progress',																								
 				data: {
 					filesgroupid: filesgroupid,
 					bytesReceived: bytesReceived,

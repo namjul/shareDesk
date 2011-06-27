@@ -1,8 +1,5 @@
-
-///////////////////////////////////////////
-//           socket.io routing           //
-///////////////////////////////////////////
-
+// Socket.io routing   
+// -------------
 var io = require('socket.io'),
 	util = require('util'),
 	fs = require('fs');
@@ -59,31 +56,51 @@ module.exports = function(app) {
 		});
 
 		client.on('disconnect', function() {
-			//leaveRoom(client);
+			leaveRoom(client);
 		});
 
-	  //tell all others that someone has connected
-	  //client.broadcast('someone has connected');
 	});
 	
 	
-	//--------------
-	// Some Functions
+	// Handlers
 	//--------------
 	
+	//Creates room and send files and users to Client
 	function initClient (client) {
 
-		getRoom(client, function(room) {
-			
+		getRoom(client, function(room) {	
 			//Send client all the files from the room
 			model.getAllFiles(room, function(err, files) {
 				client.send({ action: 'initFiles', data: files});
 			});
 
+			roommates_clients = rooms.room_clients(room);
+			roommates = [];
+
+			var j = 0;
+			for (i in roommates_clients)
+			{
+				if (roommates_clients[i].sessionId != client.sessionId)
+				{
+					roommates[j] = {
+						sid: roommates_clients[i].sessionId,
+					};
+					j++;
+				}
+			}
+
+			console.log('initialusers: ' + roommates);
+			client.send(
+				{
+					action: 'initialUsers',
+					data: roommates
+				}
+			)
+			
 		});
 	}
 
-	
+	//Adds client to a room and sends an annoucement to other clients
 	function joinRoom (client, room, successFunction) {
 		var msg = {
 			action : 'join-announce',
@@ -104,11 +121,21 @@ module.exports = function(app) {
 
 		successFunction();
 	}
+	
+	//Removes client from a room and sends an annoucement to other clients
+	function leaveRoom (client) {
+		console.log (client.sessionId + ' just left');
+		var msg = {};
+		msg.action = 'leave-announce';
+		msg.data	= { sid: client.sessionId };
+		rooms.remove_from_all_rooms_and_announce(client, msg);
 
+	}
+	
 
+	//Saves new destination of file
 	function moveFile(client, msg) {
-		//report to all other browsers
-		var messageOut = {
+				var messageOut = {
 			action: msg.action,
 			data: {
 				id: msg.data.id,
@@ -118,7 +145,7 @@ module.exports = function(app) {
 				}
 			}
 		};
-
+		//report to all other clients
 		broadcastToRoom( client, messageOut );
 
 		model.setFilePosition(null, msg.data.id, msg.data.position.left, msg.data.position.top, function(error, file) {
@@ -126,7 +153,7 @@ module.exports = function(app) {
 		});
 	}
 
-
+	//Creates new file and reposts to other clients
 	function newFile (client, data) {
 		var msg = {
 			action: 'newFile',
@@ -136,7 +163,7 @@ module.exports = function(app) {
 
 	}
 
-
+	//Renames file and reports to other clients
 	function renameFile (client, fileId, newName) {
 		model.renameFile(fileId, newName, function(error, file) {
 			var msg = {};
@@ -148,7 +175,7 @@ module.exports = function(app) {
 		});
 	}
 
-
+	//Delets Ffile and report
 	function deleteFile (client, fileId) {
 		model.getFile(fileId, function(error, file) {
 			if(error) {
@@ -168,20 +195,20 @@ module.exports = function(app) {
 					}
 				});
 			}
+			//delete file on storage
 			fs.unlink(file.location, function(error, test) {
-				//console.log(error, test);
 			});
 		});
 	}
 
-	
+	//Returns the room the client is in.
 	function getRoom( client , callback ) {
 		room = rooms.get_room( client );
 		//console.log( 'client: ' + client.sessionId + " is in " + room);
 		callback(room);
 	}
 
-
+	//Broadcasts a message to other clients than the given one
 	function broadcastToRoom ( client, message ) {
 		rooms.broadcast_to_roommates(client, message);
 	}
