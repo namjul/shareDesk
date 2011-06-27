@@ -73,13 +73,13 @@ form.home input:focus {
 /* New Files */
 .file {
   width: 100px;
-  height: 90px;
   position: absolute;
   left: 0;
   top: 0;
   background: transparent;
   text-align: center;
   padding: 3px;
+  overflow-x: hidden;
   /*round borders*/
 
   -moz-border-radius: 5px;
@@ -104,7 +104,6 @@ form.home input:focus {
   font-family: 'Courier';
   font-size: 10px;
   width: 100px;
-  overflow-x: hidden;
 }
 .format {
   position: relative;
