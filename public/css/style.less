@@ -4,15 +4,16 @@
 /* --------------------------->>> GLOBAL <<<-----------------------------*/
 /* ----------------------------------------------------------------------*/
 
-
+body {
+	background:url(../images/background.jpg);
+}
 /* ----------------------------------------------------------------------*/
 /* -------------------------->>> STRUCTUR <<<----------------------------*/
 /* ----------------------------------------------------------------------*/
 #wrapper {
-	position:fixed;
+	position:absolute;
 	width:100%;
 	height:100%;
-	background:url(../images/background.jpg);
 }
 	#dragSignal {
 		position:absolute;
@@ -52,18 +53,6 @@
 		background-repeat:no-repeat;
 	}
 
-	#timeLeft {
-		position:fixed;
-		left:0;
-		bottom:0;
-		height:20px;
-		background:#fff;
-		background:rgba(255,255,255,0.5);
-		line-height:20px;
-		padding:0 10px;
-		color:#fff;
-	}
-
 	#brokenFile {
 		position:relative;
 		top:50px;
@@ -79,6 +68,66 @@
 		color:#fff;
 		font-size:25px;
 		font-family:'Cabin Sketch', arial, serif;
+	}
+
+	#infoBar {
+		position:fixed;
+		left:0;
+		right:0;
+		bottom:0;
+		height:20px;
+		line-height:20px;
+		background:#000;
+		background:rgba(0,0,0,0.2);
+	}
+
+	#timeLeft {
+		position:fixed;
+		left:0;
+		bottom:0;
+		height:20px;
+		background:#fff;
+		background:rgba(255,255,255,0.5);
+		line-height:20px;
+		padding:0 10px;
+		color:#fff;
+	}
+
+	#fileSizeLegend {
+		position:fixed;
+		right:0;
+		bottom:0;
+		height:20px;
+		line-height:20px;
+		list-style:none;
+
+		li {
+			float:right;
+			padding:0 5px;
+			color:#fff;
+			color:rgba(255,255,255,0.5);
+		}
+
+		li.legend {
+			background:#3D3D3D;
+			background:rgba(255,255,255,0.5);
+		}
+		li.small {
+			background:#6FE85F;
+			background:rgba(111,232,95,0.5);
+		}
+		li.big {
+			background:#41914C;
+			background:rgba(65,145,76,0.5);
+		}
+		li.bigger {
+			background:#C9995B;
+			background:rgba(201,153,91,0.5);
+		}
+		li.extrem {
+			background:#C9605B;
+			background:rgba(201,96,91,0.5);
+		}
 	}
 
 /* home page */
@@ -184,6 +233,47 @@ form.home {
 		width:100px;
 	}
 }
+
+.fileSmall {
+	&:hover {
+		border-top:solid 3px rgba(111,232,95,0.5);
+		border-left:solid 3px rgba(111,232,95,0.5);
+		border-right:solid 3px rgba(111,232,95,0.5);
+
+		background:rgba(255,255,255,0.1);
+	}
+}
+
+.fileBig {
+	&:hover {
+		border-top:solid 3px rgba(65,145,76,0.5);
+		border-left:solid 3px rgba(65,145,76,0.5);
+		border-right:solid 3px rgba(65,145,76,0.5);
+
+		background:rgba(255,255,255,0.1);
+	}
+}
+
+.fileBigger {
+	&:hover {
+		border-top:solid 3px rgba(201,153,91,0.5);
+		border-left:solid 3px rgba(201,153,91,0.5);
+		border-right:solid 3px rgba(201,153,91,0.5);
+
+		background:rgba(255,255,255,0.1);
+	}
+}
+
+.fileExtrem {
+	&:hover {
+		border-top:solid 3px rgba(201,96,91,0.5);
+		border-left:solid 3px rgba(201,96,91,0.5);
+		border-right:solid 3px rgba(201,96,91,0.5);
+
+		background:rgba(255,255,255,0.1);
+	}
+}
+
 
 .format {
 		position:relative;

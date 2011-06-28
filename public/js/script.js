@@ -79,12 +79,12 @@ function getMessage( m )
 
 		case 'newFile':
 			console.log('newFile', data);
-			drawUploadingFile(data.filesgroupid, data.name, data.x, data.y, data.format);
+			drawUploadingFile(data);
 			break;
 
 		case 'createFile':
 			console.log('createFile', data);
-			setUploadedFile(data.filesgroupid, data.file._id, data.file.name, data.file.format);
+			setUploadedFile(data.filesgroupid, data.file);
 			break;
 
 		case 'renameFile':
@@ -100,6 +100,11 @@ function getMessage( m )
 			showProcess(data.filesgroupid, data.bytesReceived, data.bytesExpected);
 			break;
 
+		case 'timeLeft':
+			console.log('timeLeft');
+			$('#timeLeft').text(data.timeLeft);
+			break;
+
 		default:
 			//unknown message
 			console.log('unknows message', action, data);
@@ -111,11 +116,35 @@ function getMessage( m )
 
 
 // ###Just Drawing a new file
-function drawNewFile(id, name, x, y, format) {
+function drawNewFile(file) {
 
+	var id = file._id,
+			name = file.name,
+			x = file.x,
+			y = file.y,
+			format = file.format;
+	
 	var fileID = id;
 	var formatValue = format.substr(0,format.indexOf('/'));
 	var formatClass = '';
+	var fileSizeIndocator;
+
+	if(file.size !== undefined) {
+		var inMB = file.size/1000/1000; 
+		if(inMB > 1000) {
+			fileSizeIndocator = 'fileExtrem';
+		}
+		else if(inMB > 500) {
+			fileSizeIndocator = 'fileBigger';
+		}
+		else if(inMB > 100) {
+			fileSizeIndocator = 'fileBig';
+		}
+		else {
+			fileSizeIndocator = 'fileSmall';
+		}
+	}
+
 
 	console.log(format);
 
@@ -143,7 +172,7 @@ function drawNewFile(id, name, x, y, format) {
 	}
 
 
-	var fileHTML = '<div id="' + fileID + '" class="file draggable">\
+	var fileHTML = '<div id="' + fileID + '" class="file draggable ' + fileSizeIndocator + '">\
 										<div class="operations">\
 											<a href="http://' + location.host + '/download' + location.pathname + '/' + fileID + '" class="download">download</a>\
 											<a href="#" class="delete">delete</a>\
@@ -213,7 +242,14 @@ function drawNewFile(id, name, x, y, format) {
 }
 
 // ###Show uploading file
-function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
+function drawUploadingFile(file, isOrigin) {
+
+	var filesgroupid = file.filesgroupid,
+			name = file.name,
+			x = file.x,
+			y = file.y,
+			format = file.format;
+
 	
 	if(isOrigin == undefined) isOrigin = '';
 
@@ -246,7 +282,26 @@ function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 									break;
 	}
 
-	var fileHTML = '<div class="file draggable ' + filesgroupid + ' ' + isOrigin + '">\
+	var fileSizeIndocator;
+
+	if(file.size !== undefined) {
+		var inMB = file.size/1000/1000; 
+		if(inMB > 1000) {
+			fileSizeIndocator = 'fileExtrem';
+		}
+		else if(inMB > 500) {
+			fileSizeIndocator = 'fileBigger';
+		}
+		else if(inMB > 100) {
+			fileSizeIndocator = 'fileBig';
+		}
+		else {
+			fileSizeIndocator = 'fileSmall';
+		}
+	}
+
+
+	var fileHTML = '<div class="file draggable ' + filesgroupid + ' ' + isOrigin + ' ' + fileSizeIndocator + '">\
 										<div class="operations">\
 										</div>\
 										<div class="format">\
@@ -273,7 +328,14 @@ function drawUploadingFile(filesgroupid, name, x, y, format, isOrigin) {
 }
 
 // ###Set file when upload has completed
-function setUploadedFile(filesgroupid, id, name, format) {
+function setUploadedFile(filesgroupid, file) {
+
+	var id = file.id,
+			name = file.name,
+			x = file.x,
+			y = file.y,
+			format = file.format;
+
 	
 	var $file = $('.'+filesgroupid);
 	var fileID = id;
@@ -394,7 +456,15 @@ function showProcess(id, bytesReceived, bytesExpected) {
 	var newOpacity = ((-percent*100 % 100) + 100) % 100;
 
 	if($('.'+id).length == 0) {
-		drawUploadingFile(id, 'uploading...', 0, 0, 'unknown');	
+		var file = {
+			filesgroupid : id,
+			name : 'uploading...',
+			x : 0,
+			y : 0,
+			format : 'unknown',
+
+		}
+		drawUploadingFile(file);	
 	}
 
 	$('.' + id + ' .progressPercent span').text(Math.round(100*percent));
@@ -455,7 +525,7 @@ function initFiles( fileArray ) {
 	}
 	for (i in fileArray) {
 		file = fileArray[i];
-		drawNewFile(file._id, file.name, file.x, file.y, file.format);
+		drawNewFile(file);
 	}
 }
 
