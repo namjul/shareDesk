@@ -9,7 +9,7 @@ var connect = require('connect'),
 	mongoStore = require('connect-mongodb'),
 	model = require('./models/model-native-driver').db,
 	util = require('util'),
-	port = (process.env.PORT || 8081),
+	port = (process.argv[2] || 8081),
 	rooms	= require('./logics/rooms.js'),
 	formidable = require('formidable'),
 	exec = require('child_process').exec,
@@ -33,7 +33,6 @@ app.configure(function() {
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
-
 
 // node environment, use in terminal: "export NODE_ENV=production"
 //NODE_ENV=test
@@ -140,7 +139,7 @@ app.get('/:deskname', function(req, res){
 	app.model.getDesk(deskname, function(error, desk) {
 		if(error) console.log('Error');
 		else {
-			if(desk !== undefined ){
+			if(desk !== undefined && desk.date !== undefined){
 				var currentTime = new Date();
 				var diffTime = currentTime.getTime()-desk.date.getTime();
 				var diffMinutes = Math.ceil(diffTime / ( 1000 * 60 ));
@@ -189,7 +188,7 @@ app.get('/:deskname', function(req, res){
 						res.render('index.jade', {
 							locals: {
 								pageTitle: ('shareDesk - ' + req.params.deskname),
-								timeLeft: deskTime
+								timeLeft: deskTime + ' Tage bis reset'
 							}
 						});
 					});
@@ -207,7 +206,7 @@ app.get('/:deskname', function(req, res){
 				res.render('index.jade', {
 					locals: {
 						pageTitle: ('shareDesk - ' + req.params.deskname),
-						timeLeft: 'leer'
+						timeLeft: 'Dateien bleiben '+ deskTime +' Minuten erhalten'
 					}
 				});
 			}
