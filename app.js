@@ -152,17 +152,17 @@ app.get('/:deskname', function(req, res){
 				//falls weniger als 1 Minute
 				if(leftTime < 60) {
 					leftTime = leftTime;
-					leftTimeMessage = ' Minuten bis reset';
+					leftTimeMessage = ' Minuten bis Reset';
 				}
 				//falls weniger als 1 Tag
 				else if(leftTime/60 < 24) {
 					leftTime = leftTime/60;
-					leftTimeMessage = ' Stunden bis reset';
+					leftTimeMessage = ' Stunden bis Reset';
 				}
 				//falls größer noch Tage
 				else {
 					leftTime = leftTime/60/24;
-					leftTimeMessage = ' Tage bis reset';
+					leftTimeMessage = ' Tage bis Reset';
 				}
 
 				leftTimeMessage = leftTime.toFixed(2) + leftTimeMessage;
@@ -344,17 +344,17 @@ function sendTimeLeft(deskname) {
 				//falls weniger als 1 Minute
 				if(leftTime < 60) {
 					leftTime = leftTime;
-					leftTimeMessage = ' Minuten bis reset';
+					leftTimeMessage = ' Minuten bis Reset';
 				}
 				//falls weniger als 1 Tag
 				else if(leftTime/60 < 24) {
 					leftTime = leftTime/60;
-					leftTimeMessage = ' Stunden bis reset';
+					leftTimeMessage = ' Stunden bis Reset';
 				}
 				//falls größer noch Tage
 				else {
 					leftTime = leftTime/60/24;
-					leftTimeMessage = ' Tage bis reset';
+					leftTimeMessage = ' Tage bis Reset';
 				}
 
 				console.log('TimeLeft', leftTime);

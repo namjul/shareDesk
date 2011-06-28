@@ -140,7 +140,7 @@ function drawNewFile(file) {
 		else if(inMB > 100) {
 			fileSizeIndocator = 'fileBig';
 		}
-		else {
+		else if(inMB > 10) {
 			fileSizeIndocator = 'fileSmall';
 		}
 	}
