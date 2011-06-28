@@ -69,13 +69,28 @@ db.prototype.createDesk = function(deskName, callback) {
     this.getCollection(function(error, desk_collection) {
 		if( error ) callback(error)
       	else {
-        	desk_collection.insert({name:deskName}, function(error, objects) {
+					 var currentDate = new Date();
+        	desk_collection.insert({name:deskName, date: currentDate}, function(error, objects) {
 				if( error ) callback(error)
 				else callback(null, objects);
 			});
       	}
     });
 };
+
+/* get desktop */
+db.prototype.getDesk = function(deskName, callback) {
+    this.getCollection(function(error, desk_collection) {
+      if( error ) callback(error)
+      else {
+        desk_collection.findOne({name: deskName}, function(error, result) {
+          if( error ) callback(error)
+          else callback(null, result)
+        });
+      }
+    });
+};
+
 
 /* delete desktop */
 db.prototype.deleteDesk = function(deskName, callback) {
@@ -108,10 +123,10 @@ db.prototype.createFile = function(deskName, file, callback) {
 			desk_collection.update(
 						{name:deskName},
 						{$push:{files:file}},
-						{upsert: true},
-						function(error, file) {
-							if( error ) callback(file)
-							else callback(null, file);
+						{safe:true, upsert: false},
+						function(error) {
+							if( error ) callback(error)
+							else callback(null);
 						}
 			);
       	}
