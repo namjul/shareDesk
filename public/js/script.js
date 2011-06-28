@@ -179,11 +179,15 @@ function drawNewFile(id, name, x, y, format) {
 
 	//when user press delete button
 	$file.find('.delete').click(	function(){
+
+		var answer = confirm("Wollen sie wirklich diese Datei löschen?")
+		if (answer){
 			$file.remove();
 			//notify server of delete
-			sendAction( 'deleteFile' , { 'id': fileID });
+			sendAction( 'deleteFile' , { 'id': fileID });	
 		}
-	);
+		
+	});
 	
 	//rename files
 	$file.find('h3').editable( onFileChange,
@@ -346,11 +350,14 @@ function setUploadedFile(filesgroupid, id, name, format) {
 
 	//when user press delete button
 	$file.find('.delete').click(	function(){
+
+		var answer = confirm("Wollen sie wirklich diese Datei löschen?")
+		if (answer){
 			$file.remove();
 			//notify server of delete
-			sendAction( 'deleteFile' , { 'id': fileID });
-		}
-	);
+			sendAction( 'deleteFile' , { 'id': fileID });	
+		}		
+	});
 	
 	//rename files
 	$file.find('h3').editable( onFileChange,

@@ -109,7 +109,8 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 			path.exists('./' + file.location, function(exists) {
 				if(!exists || !file) {
 					res.render('brokenfile.jade', {
-						locals: {pageTitle: ('shareDesk - ' + req.params.deskname) }
+						locals: {pageTitle: ('shareDesk - ' + req.params.deskname) },
+						layout: 'layoutSimple.jade'
 					});
 					return;
 				}
