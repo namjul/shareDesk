@@ -330,7 +330,9 @@ function drawUploadingFile(file, isOrigin) {
 // ###Set file when upload has completed
 function setUploadedFile(filesgroupid, file) {
 
-	var id = file.id,
+	console.log('file',file );
+
+	var id = file._id,
 			name = file.name,
 			x = file.x,
 			y = file.y,

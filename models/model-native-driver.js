@@ -1,3 +1,5 @@
+// Database Operations
+//-----
 
 var Db = require('../lib/mongodb/db').Db,
     ObjectId = require('../lib/mongodb/bson/bson').ObjectID,
@@ -17,9 +19,7 @@ db = function(database, callback) {
 		db.collection('desks', function(err, collection) {
 			// make sure we have an index and unique constrain on name 
 			collection.ensureIndex({name : 1}, {unique : true}, function() {}) 
-			//self.desks = collection;
 		});
-		//callback();
 	});
 };
 
@@ -60,7 +60,6 @@ db.prototype.findById = function(id, callback) {
 };
 
 
-//-----
 //Desktop Operations
 //-----
 
@@ -107,7 +106,6 @@ db.prototype.deleteDesk = function(deskName, callback) {
 
 
 
-//-----
 //File Operations
 //-----
 
@@ -200,7 +198,7 @@ db.prototype.renameFile = function(id, newName, callback) {
     });
 };
 
-/* change position file */
+// change position file 
 db.prototype.setFilePosition = function(deskName, id, x, y, callback) {
     this.getCollection(function(error, desk_collection) {
       	if( error ) callback(error)
@@ -217,7 +215,7 @@ db.prototype.setFilePosition = function(deskName, id, x, y, callback) {
     });
 };
 
-/* delete file */
+// delete file 
 db.prototype.deleteFile = function(id, callback) {
     this.getCollection(function(error, desk_collection) {
       	if( error ) callback(error)
