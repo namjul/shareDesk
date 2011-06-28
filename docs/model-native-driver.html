@@ -1,0 +1,211 @@
+<!DOCTYPE html>  <html> <head>   <title>model-native-driver.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               model-native-driver.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h2>Database Operations</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">Db</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../lib/mongodb/db&#39;</span><span class="p">).</span><span class="nx">Db</span><span class="p">,</span>
+    <span class="nx">ObjectId</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../lib/mongodb/bson/bson&#39;</span><span class="p">).</span><span class="nx">ObjectID</span><span class="p">,</span>
+    <span class="nx">Server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../lib/mongodb/connection&#39;</span><span class="p">).</span><span class="nx">Server</span><span class="p">,</span>
+	<span class="nx">conf</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../config.js&#39;</span><span class="p">).</span><span class="nx">database</span><span class="p">,</span>
+	<span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">);</span>
+
+<span class="nx">db</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">database</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="k">this</span><span class="p">.</span><span class="nx">desks</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
+	<span class="k">this</span><span class="p">.</span><span class="nx">db</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Db</span><span class="p">(</span><span class="nx">database</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Server</span><span class="p">(</span><span class="nx">conf</span><span class="p">.</span><span class="nx">hostname</span><span class="p">,</span> <span class="nx">conf</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{}));</span>
+	
+	<span class="k">this</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">db</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">db</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;no database connection&#39;</span><span class="p">);</span>
+		<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">(</span><span class="s1">&#39;desks&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">collection</span><span class="p">)</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>make sure we have an index and unique constrain on name </p>             </td>             <td class="code">               <div class="highlight"><pre>			<span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">({</span><span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="nx">unique</span> <span class="o">:</span> <span class="kc">true</span><span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{})</span> 
+		<span class="p">});</span>
+	<span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getCollection</span><span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">(</span><span class="s1">&#39;desks&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">findAll</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">desk_collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">cursor</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+          <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">cursor</span><span class="p">.</span><span class="nx">toArray</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+              <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+              <span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">results</span><span class="p">)</span>
+            <span class="p">});</span>
+          <span class="p">}</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">findById</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">desk_collection</span><span class="p">.</span><span class="nx">findOne</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="nx">id</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+          <span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Desktop Operations</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="cm">/* create desktop */</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">createDesk</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">deskName</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      	<span class="k">else</span> <span class="p">{</span>
+					 <span class="kd">var</span> <span class="nx">currentDate</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+        	<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="nx">name</span><span class="o">:</span><span class="nx">deskName</span><span class="p">,</span> <span class="nx">date</span><span class="o">:</span> <span class="nx">currentDate</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">objects</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+				<span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">objects</span><span class="p">);</span>
+			<span class="p">});</span>
+      	<span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="cm">/* get desktop */</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getDesk</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">deskName</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">desk_collection</span><span class="p">.</span><span class="nx">findOne</span><span class="p">({</span><span class="nx">name</span><span class="o">:</span> <span class="nx">deskName</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+          <span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+
+<span class="cm">/* delete desktop */</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">deleteDesk</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">deskName</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      	<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      	<span class="k">else</span> <span class="p">{</span>
+      		<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">remove</span><span class="p">({</span><span class="nx">name</span><span class="o">:</span><span class="nx">deskName</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">ka</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">ka</span><span class="p">)</span>
+				<span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">ka</span><span class="p">);</span>
+			<span class="p">});</span>
+      	<span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h2>File Operations</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="cm">/* create file */</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">createFile</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">deskName</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      	<span class="k">else</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>creatíng new key</p>             </td>             <td class="code">               <div class="highlight"><pre>			<span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ObjectId</span><span class="p">();</span>
+			<span class="nx">file</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+			
+			<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span>
+						<span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="nx">deskName</span><span class="p">},</span>
+						<span class="p">{</span><span class="nx">$push</span><span class="o">:</span><span class="p">{</span><span class="nx">files</span><span class="o">:</span><span class="nx">file</span><span class="p">}},</span>
+						<span class="p">{</span><span class="nx">safe</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span> <span class="nx">upsert</span><span class="o">:</span> <span class="kc">false</span><span class="p">},</span>
+						<span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+							<span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+						<span class="p">}</span>
+			<span class="p">);</span>
+      	<span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="cm">/* get file */</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getFile</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+		<span class="k">else</span> <span class="p">{</span>
+			<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">findOne</span><span class="p">({</span><span class="s1">&#39;files._id&#39;</span><span class="o">:</span><span class="nx">ObjectId</span><span class="p">(</span><span class="nx">id</span><span class="p">)},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">if</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+				<span class="k">else</span> <span class="p">{</span>
+					<span class="k">if</span><span class="p">(</span><span class="nx">desk</span><span class="p">)</span> <span class="p">{</span>
+						<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">desk</span><span class="p">.</span><span class="nx">files</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">if</span><span class="p">(</span><span class="nx">desk</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">_id</span><span class="o">==</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+								<span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">desk</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+							<span class="p">}</span>
+						<span class="p">}</span>
+					<span class="p">}</span>
+					<span class="k">else</span> <span class="p">{</span>
+						<span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">[]);</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+			<span class="p">});</span>
+		<span class="p">}</span>
+	<span class="p">});</span>
+<span class="p">};</span>
+
+<span class="cm">/* get desktop files */</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getAllFiles</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">deskName</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      	<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      	<span class="k">else</span> <span class="p">{</span>
+      		<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">findOne</span><span class="p">({</span><span class="nx">name</span><span class="o">:</span><span class="nx">deskName</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+				<span class="k">else</span> <span class="p">{</span>
+					<span class="k">if</span><span class="p">(</span> <span class="nx">desk</span> <span class="o">==</span> <span class="kc">null</span> <span class="p">)</span> <span class="p">{</span>
+						<span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">[]);</span>
+					<span class="p">}</span>
+					<span class="k">else</span> <span class="p">{</span>
+						<span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">desk</span><span class="p">.</span><span class="nx">files</span> <span class="o">!=</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
+							<span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">desk</span><span class="p">.</span><span class="nx">files</span><span class="p">);</span>
+						<span class="p">}</span>
+						<span class="k">else</span> <span class="p">{</span>
+							<span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">[]);</span>
+						<span class="p">}</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+			<span class="p">});</span>
+      	<span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="cm">/* rename file */</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">renameFile</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">newName</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      	<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      	<span class="k">else</span> <span class="p">{</span>
+      		<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span>
+						<span class="p">{</span><span class="s1">&#39;files._id&#39;</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="nx">id</span><span class="p">)},</span>
+						<span class="p">{</span><span class="nx">$set</span><span class="o">:</span><span class="p">{</span><span class="s1">&#39;files.$.name&#39;</span><span class="o">:</span> <span class="nx">newName</span><span class="p">}},</span>
+						<span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+							<span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">file</span><span class="p">);</span>
+						<span class="p">}</span>
+			<span class="p">);</span>
+		<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;after update&quot;</span><span class="p">);</span>
+      	<span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>change position file </p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">setFilePosition</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">deskName</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      	<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      	<span class="k">else</span> <span class="p">{</span>
+      		<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span>
+						<span class="p">{</span><span class="s1">&#39;files._id&#39;</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="nx">id</span><span class="p">)},</span>
+						<span class="p">{</span><span class="nx">$set</span><span class="o">:</span><span class="p">{</span><span class="s1">&#39;files.$.y&#39;</span><span class="o">:</span> <span class="nx">y</span><span class="p">,</span> <span class="s1">&#39;files.$.x&#39;</span><span class="o">:</span> <span class="nx">x</span><span class="p">}},</span>
+						<span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+							<span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">file</span><span class="p">);</span>
+						<span class="p">}</span>
+			<span class="p">);</span>
+      	<span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>delete file </p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">deleteFile</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">desk_collection</span><span class="p">)</span> <span class="p">{</span>
+      	<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      	<span class="k">else</span> <span class="p">{</span>
+      		<span class="nx">desk_collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span>
+						<span class="p">{</span><span class="s1">&#39;files._id&#39;</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="nx">id</span><span class="p">)},</span>
+						<span class="p">{</span><span class="nx">$pull</span><span class="o">:</span><span class="p">{</span><span class="nx">files</span><span class="o">:</span><span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="nx">id</span><span class="p">)}}},</span>
+						<span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">if</span><span class="p">(</span> <span class="nx">error</span> <span class="p">)</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span>
+							<span class="k">else</span> <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">file</span><span class="p">);</span>
+						<span class="p">}</span>
+			<span class="p">);</span>
+      	<span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">db</span> <span class="o">=</span> <span class="nx">db</span><span class="p">;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
