@@ -145,7 +145,8 @@ window.log = function (s) {
 		};
 
 
-		$.myFileType = file.type;
+		$.myFileType = info.type;
+		$.myFileSize = info.size;
 
 		settings.resizeImage = !!(settings.imageMaxWidth || settings.imageMaxHeight);
 
@@ -546,10 +547,11 @@ window.log = function (s) {
 								name: 'uploading',
 								x: ev.clientX-20-50,
 								y: ev.clientY-20-30,
-								format: $.myFileType
+								format: $.myFileType,
+								size: $.myFileSize
 							};
 							sendAction('newFile', data);
-							drawUploadingFile(uniqueID, 'uploading...', ev.clientX-20-50, ev.clientY-20-30, $.myFileType, 'origin');
+							drawUploadingFile(data, 'origin');
 						}
 
 

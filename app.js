@@ -143,7 +143,7 @@ app.get('/:deskname', function(req, res){
 			if(desk !== undefined && desk.date !== undefined){
 				var currentTime = new Date();
 				var diffTime = currentTime.getTime()-desk.date.getTime();
-				var diffMinutes = Math.ceil(diffTime / ( 1000 * 60 ));
+				var diffMinutes = diffTime / ( 1000 * 60 );
 				var leftTimeMessage;
 				var leftTime = deskTime-diffMinutes;
 
@@ -207,7 +207,7 @@ app.get('/:deskname', function(req, res){
 				res.render('index.jade', {
 					locals: {
 						pageTitle: ('shareDesk - ' + req.params.deskname),
-						timeLeft: 'Dateien bleiben '+ deskTime +' Minuten erhalten'
+						timeLeft: 'INFO: Dateien bleiben '+ deskTime +' Minuten erhalten'
 					}
 				});
 			}
@@ -259,15 +259,17 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 
 	// uploading file done, save to db
 	form.on('file', function(name, file) {
-		console.log('file');
+		console.log('file', file);
 		var fileModel = {
 			name: file.name,
 			location: file.path,
 			x: -1,
 			y: -1,
-			format: file.type
+			format: file.type,
+			size: file.size
 		}
 
+		//Sending 'createFile' signal
 		app.model.createFile(req.params.deskname, fileModel, function(error) {
 			if (error) {
 				console.log('Desktop doesnt exist, so creating a new one',error);
@@ -289,6 +291,9 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 									}
 								}
 								rooms.broadcast_room(req.params.deskname, msg);
+
+								//send timeLeft
+								sendTimeLeft(req.params.deskname);
 							}
 						});
 					}
@@ -303,6 +308,9 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 					}
 				}
 				rooms.broadcast_room(req.params.deskname, msg);
+
+				//send timeLeft
+				sendTimeLeft(req.params.deskname);
 			}
 		});
 	});
@@ -318,6 +326,51 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 	});
 
 });
+
+
+function sendTimeLeft(deskname) {
+	//Send desk timeleft
+	app.model.getDesk(deskname, function(error, desk) {
+		if(error) console.log('Error');
+		else {
+			if(desk !== undefined && desk.date !== undefined){
+				var currentTime = new Date();
+				var diffTime = currentTime.getTime()-desk.date.getTime();
+				var diffMinutes = diffTime / ( 1000 * 60 );
+				var leftTimeMessage;
+				var leftTime = deskTime-diffMinutes;
+
+				
+				//falls weniger als 1 Minute
+				if(leftTime < 60) {
+					leftTime = leftTime;
+					leftTimeMessage = ' Minuten bis reset';
+				}
+				//falls weniger als 1 Tag
+				else if(leftTime/60 < 24) {
+					leftTime = leftTime/60;
+					leftTimeMessage = ' Stunden bis reset';
+				}
+				//falls größer noch Tage
+				else {
+					leftTime = leftTime/60/24;
+					leftTimeMessage = ' Tage bis reset';
+				}
+
+				console.log('TimeLeft', leftTime);
+				leftTimeMessage = leftTime.toFixed(2) + leftTimeMessage;
+
+				var msg = {
+					action: 'timeLeft',
+					data: {
+						timeLeft: leftTimeMessage
+						}
+				}
+				rooms.broadcast_room(deskname, msg);
+			}
+		}
+	});
+}
 
 //create Upload folder if it not exists
 var uploadFolder = './uploads/';
