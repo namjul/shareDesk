@@ -439,6 +439,13 @@ function getRandomColor() {
 
 // ###first time init files
 function initFiles( fileArray ) {
+
+	if(fileArray == 0) {
+		$('#uploadIcon').fadeIn();
+	}
+	else {
+		$('#dragArea').addClass('hasBackground');
+	}
 	for (i in fileArray) {
 		file = fileArray[i];
 		drawNewFile(file._id, file.name, file.x, file.y, file.format);

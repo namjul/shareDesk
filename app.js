@@ -12,7 +12,9 @@ var connect = require('connect'),
 	port = (process.env.PORT || 8081),
 	rooms	= require('./logics/rooms.js'),
 	formidable = require('formidable'),
-	fs = require('fs');
+	exec = require('child_process').exec,
+	fs = require('fs'),
+	deskTime = 60;
 
        
 // Setup Express
@@ -49,7 +51,6 @@ app.configure('production', function() {
 	app.set('db-uri', 'mongodb://localhost/sharedesk-production');
 	app.model = new model('sharedesk-production', function() {});
 });
-
 
 // Error handling
 // -------------
@@ -131,8 +132,84 @@ app.get('/download/:deskname/:fileid', function(req, res) {
 // Desk Route
 // different desk for each different name
 app.get('/:deskname', function(req, res){
-	res.render('index.jade', {
-		locals: {pageTitle: ('shareDesk - ' + req.params.deskname) }
+
+	var deskname = req.params.deskname;
+
+	app.model.getDesk(deskname, function(error, desk) {
+		if(error) console.log('Error');
+		else {
+			if(desk !== undefined ){
+				var currentTime = new Date();
+				var diffTime = currentTime.getTime()-desk.date.getTime();
+				var diffMinutes = Math.ceil(diffTime / ( 1000 * 60 ));
+				var leftTimeMessage;
+				var leftTime = deskTime-diffMinutes;
+
+				console.log('ZEITEN', deskTime,diffMinutes );
+				
+				//falls weniger als 1 Minute
+				if(leftTime < 60) {
+					leftTime = leftTime;
+					leftTimeMessage = ' Minuten bis reset';
+				}
+				//falls weniger als 1 Tag
+				else if(leftTime/60 < 24) {
+					leftTime = leftTime/60;
+					leftTimeMessage = ' Stunden bis reset';
+				}
+				//falls größer noch Tage
+				else {
+					leftTime = leftTime/60/24;
+					leftTimeMessage = ' Tage bis reset';
+				}
+
+				leftTimeMessage = leftTime.toFixed(2) + leftTimeMessage;
+
+				console.log(diffMinutes);
+
+				if(diffMinutes > deskTime) {
+						
+					console.log('deleted');
+					app.model.deleteDesk(deskname, function() {
+
+						console.log('EIN DELETE JETZT');
+
+						var child = exec('rm -R ./uploads/'+ deskname,
+							function (error, stdout, stderr) {
+								console.log('stdout: ' + stdout);
+								console.log('stderr: ' + stderr);
+								if (error !== null) {
+									console.log('exec error: ' + error);
+								}
+						});
+						
+						//render view
+						res.render('index.jade', {
+							locals: {
+								pageTitle: ('shareDesk - ' + req.params.deskname),
+								timeLeft: deskTime
+							}
+						});
+					});
+				} else {
+					//render view
+					res.render('index.jade', {
+						locals: {
+							pageTitle: ('shareDesk - ' + req.params.deskname), 
+							timeLeft: leftTimeMessage
+						}
+					});
+				}
+			} else {
+				//render view
+				res.render('index.jade', {
+					locals: {
+						pageTitle: ('shareDesk - ' + req.params.deskname),
+						timeLeft: 'leer'
+					}
+				});
+			}
+		}	
 	});
 });
 
@@ -180,8 +257,32 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 			format: file.type
 		}
 
-		app.model.createFile(req.params.deskname, fileModel, function(error, db_file) {
-			if (error) console.log(error);
+		app.model.createFile(req.params.deskname, fileModel, function(error) {
+			if (error) {
+				console.log('Desktop doesnt exist, so creating a new one',error);
+				app.model.createDesk(req.params.deskname, function(error) {
+					if (error) {
+						console.log('Creating Desktop error?: ',error);
+					} 
+					else {
+						app.model.createFile(req.params.deskname, fileModel, function(error) {
+							if (error) {
+								console.log('Error creating File', error);
+							}
+							else {
+								var msg = {
+									action: 'createFile',
+									data: {
+										filesgroupid: filesgroupid,
+										file: fileModel
+									}
+								}
+								rooms.broadcast_room(req.params.deskname, msg);
+							}
+						});
+					}
+				});
+			}
 			else {
 				var msg = {
 					action: 'createFile',

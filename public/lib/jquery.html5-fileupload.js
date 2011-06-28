@@ -506,8 +506,35 @@ window.log = function (s) {
 						return false;
 					}
 				).bind(
+					'dragenter',
+					function(ev) {
+						
+						console.log('dragenter');
+						$('#dragArea').fadeIn();
+						
+						$('#dragArea').bind(
+							'dragleave',
+							function(ev) {
+
+								console.log('dragleave');
+								$('#dragArea').fadeOut();
+								return false;
+							}
+						);
+
+						return false;
+					}
+				).bind(
 					'drop',
 					function (ev) {	
+						
+						$('#dragArea').fadeOut(function() {
+							if(!$('#dragArea').hasClass('hasBackground')) {
+								$('#dragArea').addClass('hasBackground');
+							}
+						});
+						$('#uploadIcon').css('background-image', 'none');
+												
 
 						var uniqueID = Math.round(Math.random()*99999999);
 
