@@ -127,7 +127,7 @@ function drawNewFile(file) {
 	var fileID = id;
 	var formatValue = format.substr(0,format.indexOf('/'));
 	var formatClass = '';
-	var fileSizeIndocator;
+	var fileSizeIndocator = '';
 
 	if(file.size !== undefined) {
 		var inMB = file.size/1000/1000; 
@@ -282,7 +282,7 @@ function drawUploadingFile(file, isOrigin) {
 									break;
 	}
 
-	var fileSizeIndocator;
+	var fileSizeIndocator = '';
 
 	if(file.size !== undefined) {
 		var inMB = file.size/1000/1000; 
@@ -295,7 +295,7 @@ function drawUploadingFile(file, isOrigin) {
 		else if(inMB > 100) {
 			fileSizeIndocator = 'fileBig';
 		}
-		else {
+		else if(inMB > 10) {
 			fileSizeIndocator = 'fileSmall';
 		}
 	}
