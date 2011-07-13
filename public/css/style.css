@@ -1,39 +1,230 @@
 @import "reset.css";
-/* ----------------------------------------------------------------------*/
-/* --------------------------->>> GLOBAL <<<-----------------------------*/
-/* ----------------------------------------------------------------------*/
 body {
   background: url(../images/background.jpg);
 }
-/* ----------------------------------------------------------------------*/
-/* -------------------------->>> STRUCTUR <<<----------------------------*/
-/* ----------------------------------------------------------------------*/
-#wrapper {
+@font-face {
+  font-family: 'AllerItalic';
+  src: url('../fonts/aller_it-webfont.eot');
+  src: url('../fonts/aller_it-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/aller_it-webfont.woff') format('woff'), url('../fonts/aller_it-webfont.ttf') format('truetype'), url('../fonts/aller_it-webfont.svg#AllerItalic') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'AllerRegular';
+  src: url('../fonts/aller_rg-webfont.eot');
+  src: url('../fonts/aller_rg-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/aller_rg-webfont.woff') format('woff'), url('../fonts/aller_rg-webfont.ttf') format('truetype'), url('../fonts/aller_rg-webfont.svg#AllerRegular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+#shareDesk {
   position: absolute;
-  width: 100%;
+  top: 100px;
+  left: 50%;
+  margin-left: -200px;
+  width: 400px;
+  text-align: center;
+  color: #373739;
+  font-size: 65px;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  text-decoration: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+/*
+ * 	------------------><)
+ *	HoMe STYLeS
+ *	------------------><)
+ */
+body.home {
+  border-top: solid 5px rgba(255, 255, 255, 0.3);
+  overflow-x: hidden;
+}
+#homeWrapper {
+  position: relative;
+  width: 322px;
+  height: 300px;
+  text-align: center;
+  margin: 220px auto 0 auto;
+}
+#homeWrapper div.start {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+#homeWrapper div.start p {
+  color: #e4fff1;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  font-size: 22px;
+  line-height: 30px;
+}
+#homeWrapper div.start p a {
+  color: #909090;
+  font-family: 'AllerItalic', 'Arial', 'Courier';
+  font-size: 20px;
+  text-decoration: none;
+}
+#homeWrapper div.start p a:hover {
+  color: #fff;
+}
+#homeWrapper div.about {
+  position: relative;
+  top: 0;
+  left: 1000px;
+  display: none;
+  opacity: 0;
+  /* Standard: FF gt 1.5, Opera, Safari */
+
+  filter: alpha(opacity=0);
+  /* IE lt 8 */
+
+  -ms-filter: "alpha(opacity=0)";
+  /* IE 8 */
+
+  -khtml-opacity: 0;
+  /* Safari 1.x */
+
+  -moz-opacity: 0;
+  /* FF lt 1.5, Netscape */
+}
+#homeWrapper div.about p {
+  color: #fff;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+}
+#homeWrapper div.about a {
+  color: #fff;
+}
+#homeWrapper div.about h1 {
+  color: #e4fff1;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  font-size: 18px;
+  font-weight: normal;
+}
+#homeWrapper ul {
+  list-style: none;
+  margin: 0;
+}
+#homeWrapper ul li {
+  color: #fff;
+}
+#homeWrapper ul a {
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  text-decoration: none;
+  font-size: 13px;
+  color: #fff;
+  padding: 0 5px;
+}
+/* shareDesk Input/Button */
+.sdInput {
+  position: relative;
+  height: 73px;
+  width: 322px;
+  overflow: hidden;
+  display: inline-block;
+  -moz-box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.5);
+  /* FF3.5+ */
+
+  -webkit-box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.5);
+  /* Saf3.0+, Chrome */
+
+  box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.5);
+  /* Opera 10.5, IE9, Chrome 10+ */
+
+}
+.sdInput .back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #e4e4e4;
   height: 100%;
+  width: 100%;
+  opacity: .6;
+  /* Standard: FF gt 1.5, Opera, Safari */
+
+  filter: alpha(opacity=60);
+  /* IE lt 8 */
+
+  -ms-filter: "alpha(opacity=60)";
+  /* IE 8 */
+
+  -khtml-opacity: .60;
+  /* Safari 1.x */
+
+  -moz-opacity: .60;
+  /* FF lt 1.5, Netscape */
 }
-#dragSignal {
+.sdInput .backgroundImage {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
-  margin: 20px;
-  border: solid 5px blue;
+  top: 1px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
 }
-#uploadIcon {
+.sdInput .backgroundImage img {
+  width: 100%;
+  display: block;
+  max-width: 100%;
+}
+.sdInput .illum {
   position: absolute;
-  top: 5px;
+  top: -148px;
+  left: -20px;
+  width: 388px;
+  height: 388px;
+  background: url(../images/ilumaBack.png) no-repeat;
+}
+.sdInput input {
+  position: absolute;
+  display: block;
+  border: none;
+  background: none;
+  color: #e4fff1;
+  font-size: 18px;
+  height: 100%;
+  font-family: 'Arial', 'Courier';
+  padding: 0 30px;
+}
+.sdInput input:focus {
+  outline: none;
+}
+.sdInput button {
+  position: absolute;
+  display: block;
+  border: none;
+  background: none;
+  color: #dfead2;
+  font-size: 14px;
+  height: 100%;
+  width: 100%;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  text-align: center;
+}
+/*
+ * 	------------------><)
+ *	DeSK STYLeS
+ *	------------------><)
+ */
+#filesWrapper {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: url(../images/newChalkFont.png) no-repeat center;
-  display: none;
+  overflow-x: hidden;
 }
-#dragArea {
+/* Files Area */
+#filesArea {
   position: absolute;
-  top: 5px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+#dragBack {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
@@ -42,10 +233,532 @@ body {
   display: none;
   z-index: 99;
 }
-.hasBackground {
+#dropSign {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 300px;
+  height: 300px;
+}
+#dropSign p {
+  position: relative;
+  top: 100px;
+  margin: 0 auto;
+  width: 100px;
+  height: 100px;
+  border: dashed 2px #606060;
+  background: #626262;
+  background: rgba(98, 98, 98, 0.2);
+  /*round borders*/
+
+  -moz-border-radius: 5px;
+  /* FF1-3.6 */
+
+  -webkit-border-radius: 5px;
+  /* Saf3-4, iOS 1-3.2, Android <1.6 */
+
+  border-radius: 5px;
+  /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+
+}
+.newDesktop {
   background-image: url(../images/newChalkFont.png);
   background-position: center;
   background-repeat: no-repeat;
+}
+#sort {
+  position: fixed;
+  top: 10px;
+  left: 5px;
+  color: #686868;
+  text-decoration: none;
+  font-size: 12px;
+}
+#sort:hover {
+  text-decoration: underline;
+}
+/* Active Users */
+#userBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: #fff;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0;
+  z-index: 50;
+  -moz-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.6);
+  /* FF3.5+ */
+
+  -webkit-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.6);
+  /* Saf3.0+, Chrome */
+
+  box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.6);
+  /* Opera 10.5, IE9, Chrome 10+ */
+
+}
+#userBar li {
+  float: left;
+  width: 100px;
+  height: 10px;
+  list-style: none;
+  cursor: pointer;
+}
+#userBar li div {
+  background: red;
+  height: 5px;
+  text-indent: -9999px;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+#userBar .selected div {
+  height: 10px;
+}
+#userBar .me {
+  display: none;
+}
+/* FilesBody during upload */
+#uploadingFiles {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -145px;
+  height: 140px;
+  width: 100%;
+  background: #696969;
+  background: rgba(105, 105, 105, 0.2);
+  border-top: solid 5px rgba(105, 105, 105, 0.2);
+  z-index: 49;
+}
+#uploadingFiles .file {
+  position: relative;
+  top: 0 !important;
+  left: 0 !important;
+  float: left;
+  padding: 0 5px;
+}
+/* BottomBar */
+#barWrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 25px;
+  width: 100%;
+  background: #000;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  -moz-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.6);
+  /* FF3.5+ */
+
+  -webkit-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.6);
+  /* Saf3.0+, Chrome */
+
+  box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.6);
+  /* Opera 10.5, IE9, Chrome 10+ */
+
+}
+#rightMenu {
+  height: 25px;
+  float: right;
+  width: 140px;
+}
+#meName {
+  line-height: 25px;
+  color: #fff;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  text-align: center;
+  margin: 0 1px;
+  padding: 0 3px;
+  width: 92px;
+  overflow: hidden;
+}
+#meName input {
+  border: none;
+  background: none;
+  outline: none !important;
+  color: #fff;
+  text-align: center;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+}
+#secure {
+  height: 25px;
+  width: 40px;
+  background: #e6e6e6;
+  float: right;
+  cursor: pointer;
+}
+#secure span.private {
+  width: 24px;
+  height: 17px;
+  display: block;
+  background: url(../images/secure.png) no-repeat;
+  text-indent: -9999px;
+  margin: 4px auto 0 auto;
+}
+#secure span.public {
+  width: 24px;
+  height: 16px;
+  display: block;
+  background: url(../images/secure.png) no-repeat 0 -17px;
+  text-indent: -9999px;
+  margin: 4px auto 0 auto;
+}
+#wrapLeft {
+  height: 25px;
+  margin-right: 140px;
+  /* width of rightMenu */
+
+  position: relative;
+}
+.timer {
+  float: left;
+  height: 25px;
+  width: 140px;
+  background: #5a5a5a;
+  color: #fff;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  line-height: 25px;
+  font-size: 12px;
+  padding: 0 5px;
+  text-align: center;
+}
+#chat {
+  position: relative;
+  height: 25px;
+  margin-left: 150px;
+  /* width of timer */
+
+}
+#chat #label {
+  float: left;
+  color: #fff;
+  height: 25px;
+  line-height: 25px;
+  padding: 0 10px 0 20px;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+}
+#chat #label p {
+  display: inline;
+}
+#chat #label p span {
+  padding: 0 0 0 3px;
+}
+#chat input {
+  border: none;
+  background: none;
+  color: #bcbcbc;
+  width: 100%;
+  height: 25px;
+  outline: none !important;
+}
+#inputWrap {
+  height: 25px;
+  overflow: hidden;
+}
+#chatWindow {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  min-height: 200px;
+}
+#chatContentWrap {
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+#chatContent {
+  position: absolute;
+  bottom: 0;
+  padding: 25px 0 20px 0;
+  width: 100%;
+}
+#chatContent div {
+  clear: both;
+  overflow: hidden;
+  margin: 0 20px 20px 20px;
+}
+#chatContent span {
+  float: left;
+}
+#chatContent p {
+  overflow: hidden;
+  padding-left: 10px;
+  color: #fff;
+  line-height: 150%;
+}
+#chatButton {
+  position: absolute;
+  top: -25px;
+  right: 0;
+  width: 100px;
+  height: 25px;
+  color: #fff;
+  background: #989898;
+  cursor: pointer;
+  text-align: center;
+  line-height: 22px;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+}
+#chatButton span {
+  font-size: 19px;
+}
+#chatExit {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 11px;
+  color: #393939;
+  padding: 0 5px 3px 0;
+}
+/*
+ * 	------------------><)
+ *	FiLe STYLeS
+ *	------------------><)
+ */
+.file {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.fileWrapper {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100px;
+  background: transparent;
+  text-align: center;
+  /*overflow-x:hidden;*/
+
+  /*round borders*/
+
+  -moz-border-radius: 5px;
+  /* FF1-3.6 */
+
+  -webkit-border-radius: 5px;
+  /* Saf3-4, iOS 1-3.2, Android <1.6 */
+
+  border-radius: 5px;
+  /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+
+  border: solid 2px transparent;
+}
+.fileWrapper:hover {
+  border-top: solid 2px rgba(255, 255, 255, 0.4);
+  border-left: solid 2px rgba(255, 255, 255, 0.4);
+  border-right: solid 2px rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+.active .fileWrapper {
+  border: solid 2px rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+.format {
+  position: relative;
+  width: 100px;
+  height: 65px;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 10px 0 0 0;
+  cursor: pointer;
+}
+.progress {
+  position: absolute;
+  top: 19px;
+  left: 25px;
+  width: 49px;
+  height: 46px;
+  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+.progressPercent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 49px;
+  height: 46px;
+}
+.progressPercent .progressCentering {
+  height: 100%;
+  width: 49px;
+  display: table;
+  margin: 0px auto;
+}
+.progressPercent .progressCentering span {
+  position: static;
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  color: #fff;
+  font-size: 15px;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+}
+.progressBack {
+  background: #000;
+}
+.title {
+  color: #fff;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  font-size: 12px;
+  width: 90px;
+  margin: 0 5px 10px 5px;
+  word-wrap: break-word;
+}
+.titleHolder {
+  display: none;
+}
+.fileEditForm input {
+  color: #eaeaea;
+  background: #777777;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+}
+.fileEditForm input:focus, .fileEditForm input:active {
+  outline: none !important;
+}
+.operations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100%;
+  background: rgba(31, 31, 32, 0.8);
+  display: none;
+}
+.operations p {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+}
+.operations div {
+  display: table;
+  width: 100px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.operations div:hover {
+  background: rgba(0, 0, 0, 0.46);
+}
+.operations .download {
+  color: #a3c181;
+  height: 70%;
+}
+.operations .download span {
+  display: block;
+}
+.operations .delete {
+  height: 30%;
+  color: #ef7f84;
+}
+/* File Types images*/
+.unknown {
+  background-image: url(../images/unknown.png);
+}
+.picture {
+  background-image: url(../images/picture.png);
+}
+.video {
+  background-image: url(../images/video.png);
+}
+.audio {
+  background-image: url(../images/audio.png);
+}
+.text {
+  background-image: url(../images/text.png);
+}
+.pdf {
+  background-image: url(../images/pdf.png);
+}
+/* File Size Styles*/
+.fileSizeSmall:hover {
+  border-top: solid 2px rgba(111, 232, 95, 0.5);
+  border-left: solid 2px rgba(111, 232, 95, 0.5);
+  border-right: solid 2px rgba(111, 232, 95, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+.active .fileSizeSmall {
+  border: solid 2px rgba(111, 232, 95, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+.fileSizeBig:hover {
+  border-top: solid 2px rgba(65, 145, 76, 0.5);
+  border-left: solid 2px rgba(65, 145, 76, 0.5);
+  border-right: solid 2px rgba(65, 145, 76, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+.active .fileSizeBig {
+  border: solid 2px rgba(65, 145, 76, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+.fileSizeBigger:hover {
+  border-top: solid 2px rgba(201, 153, 91, 0.5);
+  border-left: solid 2px rgba(201, 153, 91, 0.5);
+  border-right: solid 2px rgba(201, 153, 91, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+.active .fileSizeBigger {
+  border: solid 2px rgba(201, 153, 91, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+.fileSizeExtrem:hover {
+  border-top: solid 2px rgba(201, 96, 91, 0.5);
+  border-left: solid 2px rgba(201, 96, 91, 0.5);
+  border-right: solid 2px rgba(201, 96, 91, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+.active .fileSizeExtrem {
+  border: solid 2px rgba(201, 96, 91, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+/* Password protection */
+#passwordProtection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.5);
+}
+#passwordProtection div.center {
+  margin: 0 auto;
+  width: 300px;
+  height: 100%;
+  display: table;
+}
+#passwordProtection div.middle {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+#passwordProtection p {
+  font-family: 'AllerRegular', 'Arial', 'Courier';
+  color: #fff;
+  font-size: 13px;
+}
+#passwordProtection p span.error {
+  color: #be9d95;
+}
+form.file-edit-form input {
+  background: #fff;
+  border: none;
+  text-align: center;
+}
+form.file-edit-form input:focus {
+  outline: none;
+  background: #fff;
+  color: #52494B;
 }
 #brokenFile {
   position: relative;
@@ -61,278 +774,4 @@ body {
   color: #fff;
   font-size: 25px;
   font-family: 'Cabin Sketch', arial, serif;
-}
-#infoBar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 20px;
-  line-height: 20px;
-  background: #000;
-  background: rgba(0, 0, 0, 0.2);
-}
-#timeLeft {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  height: 20px;
-  background: #fff;
-  background: rgba(255, 255, 255, 0.5);
-  line-height: 20px;
-  padding: 0 10px;
-  color: #fff;
-}
-#fileSizeLegend {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  height: 20px;
-  line-height: 20px;
-  list-style: none;
-}
-#fileSizeLegend li {
-  float: right;
-  padding: 0 5px;
-  color: #fff;
-  color: rgba(255, 255, 255, 0.5);
-}
-#fileSizeLegend li.legend {
-  background: #3D3D3D;
-  background: rgba(255, 255, 255, 0.5);
-}
-#fileSizeLegend li.small {
-  background: #6FE85F;
-  background: rgba(111, 232, 95, 0.5);
-}
-#fileSizeLegend li.big {
-  background: #41914C;
-  background: rgba(65, 145, 76, 0.5);
-}
-#fileSizeLegend li.bigger {
-  background: #C9995B;
-  background: rgba(201, 153, 91, 0.5);
-}
-#fileSizeLegend li.extrem {
-  background: #C9605B;
-  background: rgba(201, 96, 91, 0.5);
-}
-/* home page */
-a.home {
-  font-family: 'arial';
-  font-size: 15px;
-  color: #615A5C;
-  width: 200px;
-  margin: 10px auto 0 auto;
-  text-align: center;
-  display: block;
-}
-form.home {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  widht: 300px;
-  height: 200px;
-  margin-top: -100px;
-  margin-left: -150px;
-  text-align: center;
-}
-form.home label {
-  font-family: 'Cabin Sketch', arial, serif;
-  font-size: 25px;
-  margin: 10px 0;
-  display: block;
-  color: #fff;
-}
-form.home input {
-  border: solid 10px #404040;
-  background: #A39EA0;
-  height: 40px;
-  width: 260px;
-  color: #fff;
-  padding: 5px 10px;
-  font-size: 20px;
-  margin: 10px;
-}
-form.home input:focus {
-  outline: none;
-  background: #fff;
-  color: #52494B;
-}
-/* Active Users */
-#activeUser {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 5px;
-  background: #fff;
-  background: rgba(255, 255, 255, 0.3);
-  margin: 0;
-}
-#activeUser li {
-  float: left;
-  background: red;
-  width: 100px;
-  height: 5px;
-  list-style: none;
-}
-/* New Files */
-.file {
-  width: 100px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: transparent;
-  text-align: center;
-  padding: 3px;
-  overflow-x: hidden;
-  /*round borders*/
-
-  -moz-border-radius: 5px;
-  /* FF1-3.6 */
-
-  -webkit-border-radius: 5px;
-  /* Saf3-4, iOS 1-3.2, Android <1.6 */
-
-  border-radius: 5px;
-  /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
-
-  border: solid 3px transparent;
-}
-.file:hover {
-  border-top: solid 3px rgba(255, 255, 255, 0.4);
-  border-left: solid 3px rgba(255, 255, 255, 0.4);
-  border-right: solid 3px rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.1);
-}
-.file h3 {
-  color: #fff;
-  font-family: 'Courier';
-  font-size: 10px;
-  width: 100px;
-}
-.fileSmall:hover {
-  border-top: solid 3px rgba(111, 232, 95, 0.5);
-  border-left: solid 3px rgba(111, 232, 95, 0.5);
-  border-right: solid 3px rgba(111, 232, 95, 0.5);
-  background: rgba(255, 255, 255, 0.1);
-}
-.fileBig:hover {
-  border-top: solid 3px rgba(65, 145, 76, 0.5);
-  border-left: solid 3px rgba(65, 145, 76, 0.5);
-  border-right: solid 3px rgba(65, 145, 76, 0.5);
-  background: rgba(255, 255, 255, 0.1);
-}
-.fileBigger:hover {
-  border-top: solid 3px rgba(201, 153, 91, 0.5);
-  border-left: solid 3px rgba(201, 153, 91, 0.5);
-  border-right: solid 3px rgba(201, 153, 91, 0.5);
-  background: rgba(255, 255, 255, 0.1);
-}
-.fileExtrem:hover {
-  border-top: solid 3px rgba(201, 96, 91, 0.5);
-  border-left: solid 3px rgba(201, 96, 91, 0.5);
-  border-right: solid 3px rgba(201, 96, 91, 0.5);
-  background: rgba(255, 255, 255, 0.1);
-}
-.format {
-  position: relative;
-  width: 100px;
-  height: 65px;
-  z-index: 1;
-}
-.format .image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100px;
-  height: 65px;
-  background-position: center;
-}
-.format .progress {
-  position: absolute;
-  top: 9px;
-  left: 25px;
-  width: 49px;
-  height: 46px;
-  background-color: transparent;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-.progressPercent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 49px;
-  height: 46px;
-}
-.progressPercent .progressCenter {
-  height: 100%;
-  width: 49px;
-  display: table;
-  margin: 0px auto;
-}
-.progressPercent .progressCenter span {
-  position: static;
-  display: table-cell;
-  text-align: center;
-  vertical-align: middle;
-  color: #fff;
-  font-size: 15px;
-}
-.progressBack {
-  background: #000;
-}
-.operations {
-  position: relative;
-  margin: 0 20px;
-  height: 10px;
-  margin-bottom: -3px;
-  z-index: 2;
-}
-.operations a {
-  display: block;
-  text-indent: -9999px;
-  width: 10px;
-  height: 10px;
-  float: right;
-  padding-left: 5px;
-}
-.operations a.download {
-  background: url(../images/download.png) no-repeat;
-}
-.operations a.delete {
-  background: url(../images/delete.png) no-repeat;
-}
-form.file-edit-form input {
-  background: #fff;
-  border: none;
-  text-align: center;
-}
-form.file-edit-form input:focus {
-  outline: none;
-  background: #fff;
-  color: #52494B;
-}
-/* File Types images*/
-.format .unknown {
-  background: url(../images/unknown.png) no-repeat;
-}
-.format .picture {
-  background: url(../images/picture.png) no-repeat;
-}
-.format .video {
-  background: url(../images/video.png) no-repeat;
-}
-.format .audio {
-  background: url(../images/audio.png) no-repeat;
-}
-.format .text {
-  background: url(../images/text.png) no-repeat;
-}
-.format .pdf {
-  background: url(../images/pdf.png) no-repeat;
-}
-.format .image {
-  background-position: center;
 }
