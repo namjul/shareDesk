@@ -85,7 +85,7 @@ socket.on('initUsers', function(users) {
 socket.on('deskCreationDate', function(date) {
 	console.log('<--- deskCreationDate', date);
 	if(!timerForDeskTimeOut) {
-		setTimer(date);
+		setTimer(date, true);
 		timerForDeskTimeOut = true;
 	}
 });
@@ -743,15 +743,18 @@ function showProcess(tempFileId, bytesReceived, bytesExpected) {
 /* Creats Timer for DeskTimeOut
  * @params creationTime of desk as date object 
  * */
-function setTimer(date) {
+function setTimer(date, isISODate) {
 
-	var s = date;
-	var a = s.split(/[^0-9]/);
-	//for (i=0;i<a.length;i++) { alert(a[i]); }
-	var d=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5] );
+	if(isISODate) {
+		var s = date;
+		var a = s.split(/[^0-9]/);
+		var d=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5] );
+	} else {
+		var d = date;
+	}
 	
 	var deskTime = $('.timer').attr('id')/1000;
-	console.log(d);
+
 
 
 	deskTimeOut();
@@ -760,7 +763,6 @@ function setTimer(date) {
 		var currentTime = new Date();
 		var diffTime = currentTime.getTime()-d.getTime();
 		var timePast = diffTime/1000;
-		console.log(currentTime.getTime(), d, currentTime.getTime()-d.getTime());
 		var timeLeft = secondsToTime(deskTime-timePast);
 		var outputTextHour = '';
 		var outputTextMinute = '';
