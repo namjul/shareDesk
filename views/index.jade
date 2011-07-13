@@ -1,12 +1,27 @@
-div#wrapper
-  div#uploadIcon
-  ul#activeUser
-  div#infoBar
-    div#timeLeft= locals.timeLeft
-    ul#fileSizeLegend
-      li.legend MB
-      li.small >10
-      li.big >100
-      li.bigger >500
-      li.extrem >1000
-  div#dragArea
+div#shareDesk ShareDesk
+div#filesWrapper
+  div#filesArea
+  div#dragBack
+    div#dropSign
+      p
+div#uploadingFiles
+div#barWrapper
+  div#rightMenu
+    div#secure
+      span(class='#{isProtected}') #{isProtected}
+    div#meName
+  div#wrapLeft
+    div.timer(id='#{deskTimeOut}', title="time left until desktop resets") #{timeLeft}
+    div#chat
+      div#chatWindow.close
+        div#chatContentWrap
+          div#chatContent
+        div#chatButton <span>+ </span>Open Chat
+        span#chatExit [esc] to exit
+      div#label Send to <p><span class="allUsers">all</span></p> :
+      p#inputWrap
+        input
+ul#userBar
+a#sort(href="#") sort
+iframe#downloadiFrame(style="display:none;")
+

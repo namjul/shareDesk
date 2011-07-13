@@ -1,4 +1,4 @@
-//     sharedesk.js 0.1.x
+//     sharedesk.js 0.2
 //     (c) 2010 Samuel Hobl, Alexander Kumbeiz, Goran Janosevic.
 
 // Initial Setup Dependencies
@@ -10,25 +10,27 @@ var connect = require('connect'),
 	model = require('./models/model-native-driver').db,
 	util = require('util'),
 	port = (process.argv[2] || 8081),
-	rooms	= require('./logics/rooms.js'),
 	formidable = require('formidable'),
 	exec = require('child_process').exec,
-	deskTime = 60;
+	demoDeskTimeOutinDays = 3,
+	deskTimeOutinDays = 60,
 	path = require('path'),
-	fs = require('fs');
+	fs = require('fs'),
+	socketio = require('socket.io'),
+	url = require('url'),
+	crypto = require('crypto');
 
        
 // Setup Express
 // -------------
 var app = module.exports = express.createServer();
-app.rooms = rooms;
 
 app.configure(function() {
  	app.set('views', __dirname + '/views');
  	app.set('view engine', 'jade');
  	app.use(express.bodyParser());
 	app.use(express.cookieParser());
-	app.use(express.session({ store: mongoStore(app.set('db-uri')), secret: 'keyboard cat'}));
+	//app.use(express.session({ store: mongoStore(app.set('db-uri')), secret: 'keyboard cat'}));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -96,86 +98,55 @@ app.get('/', function(req, res){
 	});
 });
 
-// Download Route
-// deskname is unimportant
-// fileid is the id for the whole group of file (if multiupload)
-app.get('/download/:deskname/:fileid', function(req, res) {
-	// send file
-	app.model.getFile(req.params.fileid, function(error, file) {
-		if(error) {
-			console.log("getFile error", error);
-		}
-		else {
-			path.exists('./' + file.location, function(exists) {
-				if(!exists || !file) {
-					res.render('brokenfile.jade', {
-						locals: {pageTitle: ('shareDesk - ' + req.params.deskname) },
-						layout: 'layoutSimple.jade'
-					});
-					return;
-				}
-	
-				// HTTP Header
-				res.writeHead('200', {
-					'Content-Type' : file.type,
-					'Content-Disposition' : 'attachment;filename=' + file.name,
-					'Content-Length' : fs.statSync('./' + file.location).size,
-				});
-						
-				// Filestream		
-				fs.createReadStream('./' + file.location, {
-					'bufferSize': 4 * 1024
-				}).pipe(res);
-			});
-		}
-	});
-});
 
 // Desk Route
 // different desk for each different name
 app.get('/:deskname', function(req, res){
 
 	var deskname = req.params.deskname;
-
+	
 	app.model.getDesk(deskname, function(error, desk) {
 		if(error) console.log('Error');
 		else {
-			if(desk !== undefined && desk.date !== undefined){
+
+
+			var isAuthorized = true;
+			var isProtected = false;
+
+			if(desk !== undefined && 'protection' in desk) {
+
+				isProtected = true;
+				
+				if(req.cookies.identifier != desk.protection.identifier) {
+
+					isAuthorized = false;
+
+					//render passwortrequest view
+					res.render('password.jade', {
+						locals: {
+							pageTitle: ('shareDesk - ' + req.params.deskname),
+						}
+					});
+
+				} 
+			}
+
+			deskTimeOut = deskTimeOutinDays;
+			if(deskname === 'demo') {
+				 deskTimeOut = demoDeskTimeOutinDays;
+			}
+			if(desk !== undefined && desk.date !== undefined && isAuthorized){
 				var currentTime = new Date();
 				var diffTime = currentTime.getTime()-desk.date.getTime();
-				var diffMinutes = diffTime / ( 1000 * 60 );
-				var leftTimeMessage;
-				var leftTime = deskTime-diffMinutes;
+				var diffinDays = diffTime / ( 1000 * 60 * 60 * 24 );
 
-				console.log('ZEITEN', deskTime,diffMinutes );
-				
-				//falls weniger als 1 Minute
-				if(leftTime < 60) {
-					leftTime = leftTime;
-					leftTimeMessage = ' Minuten bis Reset';
-				}
-				//falls weniger als 1 Tag
-				else if(leftTime/60 < 24) {
-					leftTime = leftTime/60;
-					leftTimeMessage = ' Stunden bis Reset';
-				}
-				//falls größer noch Tage
-				else {
-					leftTime = leftTime/60/24;
-					leftTimeMessage = ' Tage bis Reset';
-				}
-
-				leftTimeMessage = leftTime.toFixed(2) + leftTimeMessage;
-
-				console.log(diffMinutes);
-
-				if(diffMinutes > deskTime) {
+				if(diffinDays > deskTimeOut) {
 						
-					console.log('deleted');
 					app.model.deleteDesk(deskname, function() {
 
-						console.log('EIN DELETE JETZT');
+						console.log('JETZT EIN DELETE');
 
+						//Deleting all files from this desk
 						var child = exec('rm -R ./uploads/'+ deskname,
 							function (error, stdout, stderr) {
 								console.log('stdout: ' + stdout);
@@ -189,7 +160,9 @@ app.get('/:deskname', function(req, res){
 						res.render('index.jade', {
 							locals: {
 								pageTitle: ('shareDesk - ' + req.params.deskname),
-								timeLeft: deskTime + ' Tage bis reset'
+								timeLeft: 'ShareDesk',
+								deskTimeOut: deskTimeOut*86400000, 
+								isProtected: isProtected ? 'private' : 'public'
 							}
 						});
 					});
@@ -197,17 +170,21 @@ app.get('/:deskname', function(req, res){
 					//render view
 					res.render('index.jade', {
 						locals: {
-							pageTitle: ('shareDesk - ' + req.params.deskname), 
-							timeLeft: leftTimeMessage
+							pageTitle: ('shareDesk - ' + req.params.deskname),
+							timeLeft: '',
+							deskTimeOut: deskTimeOut*86400000,
+							isProtected: isProtected ? 'private' : 'public'
 						}
 					});
 				}
-			} else {
+			} else if (isAuthorized) {
 				//render view
 				res.render('index.jade', {
 					locals: {
 						pageTitle: ('shareDesk - ' + req.params.deskname),
-						timeLeft: 'INFO: Dateien bleiben '+ deskTime +' Minuten erhalten'
+						timeLeft: 'ShareDesk',
+						deskTimeOut: deskTimeOut*86400000,
+						isProtected: isProtected ? 'private' : 'public'
 					}
 				});
 			}
@@ -215,58 +192,154 @@ app.get('/:deskname', function(req, res){
 	});
 });
 
+// Download Route
+// deskname is unimportant
+app.get('/:deskname/download/:fileid', function(req, res) {
+
+	var deskname = req.params.deskname;
+
+	app.model.getDesk(deskname, function(error, desk) {
+		if(error) console.log('Error');
+		else {
+
+
+			var isAuthorized = true;
+
+			if(desk !== undefined && 'protection' in desk) {
+				
+				if(req.cookies.identifier != desk.protection.identifier) {
+
+					isAuthorized = false;
+
+					//render passwortrequest view
+					res.render('password.jade', {
+						locals: {
+							pageTitle: ('shareDesk - ' + req.params.deskname),
+						}
+					});
+
+				} 
+			} 
+
+			if(isAuthorized) {
+
+				// send file
+				app.model.getFile(req.params.fileid, function(error, file) {
+					if(error) {
+						console.log("getFile error", error);
+					}
+					else {
+						path.exists('./' + file.location, function(exists) {
+							if(!exists || !file) {
+								res.render('brokenfile.jade', {
+									locals: {pageTitle: ('shareDesk - ' + req.params.deskname) },
+									layout: 'layoutSimple.jade'
+								});
+								return;
+							}
+
+							//Add an download-click to the file
+							app.model.addDownloadClick(req.params.fileid, function(error) {
+								if(error) {
+									console.log("add DownloadClick Error", error);
+								} else {
+									file.downloads = file.downloads+1
+									app.io.sockets.in(deskname).emit('addDownloadClick', file);
+								}
+							});
+				
+							// HTTP Header
+							res.writeHead('200', {
+								'Content-Type' : file.type,
+								'Content-Disposition' : 'attachment;filename=' + file.name,
+								'Content-Length' : fs.statSync('./' + file.location).size,
+							});
+									
+							// Filestream		
+							fs.createReadStream('./' + file.location, {
+								'bufferSize': 4 * 1024
+							}).pipe(res);
+						});
+					}
+				});
+			}
+		}
+	});
+});
+
+
 // Upload Route
 // used to upload file with ajax
-app.post('/upload/:deskname/:filesgroupid', function(req, res) {
-	var filesgroupid = req.params.filesgroupid;
+app.post('/upload/:deskname/:tempFileId', function(req, res) {
+	var tempFileId = req.params.tempFileId;
 	var rcvd_bytes_complete = 0;
 	var basedir = './uploads/';
+
 
 	var form = new formidable.IncomingForm(),
 		files = [],
 		fields = [];
 
+	req.params.deskname = encodeURIComponent(req.params.deskname);
+	console.log(req.params);
+
 	var oldProgressPercentage = 0;
 	var dir = basedir + req.params.deskname;
 
+	//Should check if folder exists!
+	////missing
+	
 	form.uploadDir = dir;
+
+	var filePath = '';
+
+	form.on('fileBegin', function(name, file) {
+		console.log(name, file);
+		filePath = file.path;
+	});
 
 	// send progress-message, at one percent-rate or above
 	form.on('progress', function(bytesReceived, bytesExpected) {									
 		var newProgressPercentage = (bytesReceived / bytesExpected) * 100 | 0;
 		if(oldProgressPercentage < newProgressPercentage) {
-			var msg = {
-				action: 'progress',																								
-				data: {
-					filesgroupid: filesgroupid,
-					bytesReceived: bytesReceived,
-					bytesExpected: bytesExpected
-				}
-			}
-			rooms.broadcast_room(req.params.deskname, msg);
+			
+			app.io.sockets.in(req.params.deskname).emit('progressAnnouce', {
+				tempFileId: tempFileId, 
+				bytesReceived: bytesReceived,
+				bytesExpected: bytesExpected
+			});
+
 			oldProgressPercentage = newProgressPercentage;
+
 		}
 	});
 
-	form.on('aborted', function(error) {
-		console.log("-------------------------------error");
-		console.log(error);
+	form.on('aborted', function() {
+		console.log("---------------UPLOAD ABORTED----------------");
+		app.io.sockets.in(req.params.deskname).emit('uploadAbortedAnnouce', tempFileId);
+
+		//delete file on storage
+		fs.unlink(filePath, function(error, test) {
+			if(error) console.log('error delete file from storage: ', error);
+		});
+
 	});
 
 	form.on('end', function() {
-		console.log("end");
+		console.log("---------------UPLOAD END----------------");
 	});
 
 	// uploading file done, save to db
 	form.on('file', function(name, file) {
-		console.log('file', file);
+		console.log('Upload Done this is our file: ', util.inspect(file));
 		var fileModel = {
 			name: file.name,
 			location: file.path,
 			x: -1,
 			y: -1,
 			format: file.type,
-			size: file.size
+			size: file.size,
+			downloads: 0
 		}
 
 		//Sending 'createFile' signal
@@ -283,34 +356,25 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 								console.log('Error creating File', error);
 							}
 							else {
-								var msg = {
-									action: 'createFile',
-									data: {
-										filesgroupid: filesgroupid,
-										file: fileModel
-									}
-								}
-								rooms.broadcast_room(req.params.deskname, msg);
+		
+								
+								app.io.sockets.in(req.params.deskname).emit('fileSavedAnnouce', {
+									tempFileId: tempFileId,
+									file: fileModel
+								});
 
-								//send timeLeft
-								sendTimeLeft(req.params.deskname);
 							}
 						});
 					}
 				});
 			}
 			else {
-				var msg = {
-					action: 'createFile',
-					data: {
-						filesgroupid: filesgroupid,
-						file: fileModel
-					}
-				}
-				rooms.broadcast_room(req.params.deskname, msg);
 
-				//send timeLeft
-				sendTimeLeft(req.params.deskname);
+				
+				app.io.sockets.in(req.params.deskname).emit('fileSavedAnnouce', {
+					tempFileId: tempFileId,
+					file: fileModel
+				});
 			}
 		});
 	});
@@ -319,58 +383,203 @@ app.post('/upload/:deskname/:filesgroupid', function(req, res) {
 	// close connection when done
 	form.parse(req, function(error, fields, files) {
 
+		//console.log('PARSE',util.inspect({fields: fields, files: files}));
+
 		res.writeHead(200, {'content-type': 'text/plain'});
 		res.write('received upload:\n\n');
-		res.end(util.inspect({fields: fields, files: files}));
-		
+      	res.end();
+				
 	});
 
 });
 
 
-function sendTimeLeft(deskname) {
-	//Send desk timeleft
-	app.model.getDesk(deskname, function(error, desk) {
-		if(error) console.log('Error');
+// Password protection ROUTES
+
+app.post('/:deskname/login', function(req, res) {
+
+	//state(0): password wrong
+	//state(1): access granted
+	//state(2): desk dont exists
+	//state(3): desk is not protected
+	var resObject = {
+		state: 0,
+		message: ''
+	}
+
+
+	app.model.getDesk(req.params.deskname, function(error, desk) {
+
+		if(error) console.log('Error in getting desk from database', error);
 		else {
-			if(desk !== undefined && desk.date !== undefined){
-				var currentTime = new Date();
-				var diffTime = currentTime.getTime()-desk.date.getTime();
-				var diffMinutes = diffTime / ( 1000 * 60 );
-				var leftTimeMessage;
-				var leftTime = deskTime-diffMinutes;
 
+			if(desk === undefined) {
+				resObject.state = 2;
+				resObject.message = 'This desktop is has not being created.';
+				res.send(resObject);
 				
-				//falls weniger als 1 Minute
-				if(leftTime < 60) {
-					leftTime = leftTime;
-					leftTimeMessage = ' Minuten bis Reset';
-				}
-				//falls weniger als 1 Tag
-				else if(leftTime/60 < 24) {
-					leftTime = leftTime/60;
-					leftTimeMessage = ' Stunden bis Reset';
-				}
-				//falls größer noch Tage
-				else {
-					leftTime = leftTime/60/24;
-					leftTimeMessage = ' Tage bis Reset';
-				}
+			} else {
 
-				console.log('TimeLeft', leftTime);
-				leftTimeMessage = leftTime.toFixed(2) + leftTimeMessage;
+				if('protection' in desk) {
 
-				var msg = {
-					action: 'timeLeft',
-					data: {
-						timeLeft: leftTimeMessage
-						}
+					var passwordHash = crypto.createHash('sha1').update(req.body.password).digest("hex")
+
+					if(passwordHash != desk.protection.passwordHash) {
+						resObject.state = 0;
+						resObject.message = 'You entern a wrong password';
+						res.send(resObject);
+
+					} else {
+
+						resObject.state = 1;
+						resObject.message = 'Acces granted';
+						
+						res.cookie('identifier', desk.protection.identifier, { expires: getCookieExpire(), path:'/'+req.params.deskname });
+
+						res.send(resObject);
+
+					}
+
+				} else {
+				
+					resObject.state = 3;
+					resObject.message = 'This desk is not protected';
+					res.send(resObject);
+
 				}
-				rooms.broadcast_room(deskname, msg);
 			}
+
 		}
 	});
+});
+
+app.post('/:deskname/password', function(req, res) {
+
+	//state(0): error setting password
+	//state(1): password succesfully set
+	//state(2): password removed
+	var resObject = {
+		state: 0,
+		message: ''
+	}
+
+	app.model.getDesk(req.params.deskname, function(error, desk) {
+
+
+		if(error) console.log('Error in getting desk from database', error);
+		else {
+
+			if(desk === undefined) {
+				resObject.state = 0;
+				resObject.message = 'you need to upload files first before setting a password';
+				res.send(resObject);
+				
+			} else {
+				
+				if('protection' in desk ) {
+
+					if(req.cookies.identifier != desk.protection.identifier) {
+						resObject.state = 0;
+						resObject.message = 'Your are not authorized to change the password';
+						res.send(resObject);
+
+					} else {
+						//Rename password
+						
+						var toRemove = false;
+
+						if(req.body !== undefined) {
+							//Generate unique identifier
+							var uniqueIdentifier = Math.round(Math.random()*99999999);
+							var passwordHash = crypto.createHash('sha1').update(req.body.password).digest("hex"); 
+							var protectionObject = {
+								passwordHash:passwordHash,
+								identifier:uniqueIdentifier
+							}
+						} else {
+							toRemove = true;
+						}
+					
+
+						app.model.setPassword(req.params.deskname, protectionObject, toRemove, function(error, desk) {
+							if(error) console.log('Error in setting password', error);
+							else {
+
+								if(!toRemove) {
+
+									res.cookie('identifier', uniqueIdentifier, { expires: getCookieExpire(), path:'/'+req.params.deskname });
+									resObject.state = 1;
+									resObject.message = 'Password has been renamed';
+									res.send(resObject);
+
+										
+								} else {
+									
+									res.clearCookie('identifier')
+									resObject.state = 2;
+									resObject.message = 'Password has been removed';
+									res.send(resObject);
+
+								}
+							}
+						});
+
+
+					}
+				} else if(req.body !== undefined) {
+					//Set a password
+		
+					//Generate unique identifier
+					var uniqueIdentifier = Math.round(Math.random()*99999999);
+
+					var passwordHash = crypto.createHash('sha1').update(req.body.password).digest("hex"); 
+
+					var protectionObject = {
+						passwordHash:passwordHash,
+						identifier:uniqueIdentifier
+					}
+
+					app.model.setPassword(req.params.deskname, protectionObject, false, function(error, desk) {
+						if(error) console.log('Error in setting password process', error);
+						else {
+
+							res.cookie('identifier', uniqueIdentifier, { expires: getCookieExpire(), path:'/'+req.params.deskname });
+							resObject.state = 1;
+							resObject.message = 'Password has been created';
+							res.send(resObject);
+
+						}
+					});
+
+				} else {
+					res.clearCookie('identifier')
+					resObject.state = 0;
+					resObject.message = 'Password has been already removed';
+					res.send(resObject);
+
+				}
+			}
+		}
+	
+	});
+
+});	
+
+//Helper funktion 
+/* Converts special characters
+ * */
+app.replaceUmlauts = function (string, index){
+	var anArray = new Array(2);
+	anArray[0] = new Array("Ö", "ö", "Ä", "ä", "Ü", "ü", "ß");
+	anArray[1] = new Array("Oe", "oe", "Ae", "ae", "Ue", "ue", "sz");
+	
+	for (var i=0; i<anArray[index].length; i++){
+		myRegExp = new RegExp(anArray[index][i],"g");
+		string = string.replace(myRegExp, anArray[(index==0?1:0)][i]);
+	}
+	return string;
 }
+
 
 //create Upload folder if it not exists
 var uploadFolder = './uploads/';
@@ -383,6 +592,25 @@ fs.stat(uploadFolder, function(error, stats) {
 	}
 });
 
+//having access to socket.io in controllers
+app.io = socketio.listen(app);
+app.io.disable('reconnect');
+
+//Configure socket.io
+app.io.configure('production', function(){
+	app.io.enable('browser client minification');  // send minified client
+	app.io.enable('browser client etag');          // apply etag caching logic based on version number
+	app.io.set('log level', 1);                    // reduce logging
+	app.io.set('transports', [                     // enable all transports (optional if you want flashsocket)
+		'websocket'
+	  , 'flashsocket'
+	  , 'htmlfile'
+	  , 'xhr-polling'
+	  , 'jsonp-polling'
+	]);
+});
+
+
 // start websockets controller
 require('./controllers/websockets')(app);
 
@@ -392,5 +620,12 @@ if (!module.parent) {
 	console.log("ShareDesk server listening on port %d", app.address().port);
 }
 
+
+
+//Helper
+function getCookieExpire() {
+	var d = new Date();
+	return new Date(d.getTime() +1000*60*60*24*deskTimeOutinDays);
+}
 
 

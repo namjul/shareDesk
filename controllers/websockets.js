@@ -1,217 +1,269 @@
 // Socket.io routing   
 // -------------
-var io = require('socket.io'),
-	util = require('util'),
-	fs = require('fs');
 
 	
 module.exports = function(app) {
 
-	var socket = io.listen(app),
+	var util = require('util'),
+		fs = require('fs'),
 		model = app.model,
-		rooms	= app.rooms;
-		
+		io	= app.io;
 
-	socket.on('connection', function(client) {
-		// new client is here!
-		client.on('message', function( message ) { 
 
-			console.log("action: " + message.action + " -- data: " + util.inspect(message.data) );
+	io.sockets.on('connection', function(socket) {
 
-			if (!message.action) {
-				return;
-			}
+		//Invokes initialization
+		socket.emit('newConnection');
 
-			switch (message.action) {
-				case 'initializeMe':
-					initClient(client);
-					break;
+		//JoinDesk
+		//---------
+		//Client joins his room and initialization begins
+		socket.on('joinDesk', function(data) {
 
-				case 'joinRoom':
-					joinRoom(client, message.data, function(clients) {
-						client.send( { action: 'roomAccept', data: '' } );
-					});
-					break;
+			var deskName = data.deskName;
+			app.model.getDesk(deskName, function(error, desk) {
+				if(error) console.log('Error');
+				else {
 
-				case 'moveFile':
-					
-					moveFile(client, message);
-					break;
+					var isAuthorized = true;
+					if(desk !== undefined && 'protection' in desk && 'identifier' in data) {
+						if(data.identifier != desk.protection.identifier) {
+							isAuthorized = false;
+							socket.emit('notAllowed');
+						} 
+					} 
 
-				case 'newFile':
-					newFile(client, message.data);
-					break;
+					//Access granted
+					if(isAuthorized) {
 
-				case 'renameFile':
-					renameFile(client, message.data.id, message.data.value);
-					break;
+						//save deskName in clients socket			
+						socket.deskName = deskName;
+						socket.userColor = getRandomColorObject();
+						socket.username = 'anonym';
 
-				case 'deleteFile':
-					deleteFile(client, message.data.id);
-					break;
-				default:
-					console.log('unknown action');
-					break;
-			}
+						//Join Desk
+						socket.join(deskName);
+
+
+						//Send client all the files from the room
+						model.getAllFiles(deskName, function(err, filesasArray) {
+							socket.emit('initFiles', filesasArray);
+						});
+						
+						
+						var currentUsersinDesk = new Array();
+						var count = 0;
+						for(i in io.sockets.clients(deskName)) {	
+
+							var userSId = io.sockets.clients(deskName)[i].id; 
+							var color = io.sockets.clients(deskName)[i].userColor;
+							var username = io.sockets.clients(deskName)[i].username;
+
+							count++;
+
+							var user = {
+								sid: userSId,
+								color: color,
+								username: username,
+								me: false
+							}
+
+							
+							currentUsersinDesk.push(user);
+
+							if(userSId === socket.id) {
+								socket.broadcast.to(deskName).emit('joinAnnouce', user);
+								user.me = true;	
+							}
+
+							if(count == io.sockets.clients(deskName).length) {
+								socket.emit('initUsers', currentUsersinDesk);
+							}
+
+
+						}
+
+						model.getDesk(deskName, function(error, desk) {
+							if(error) console.log('Error');
+							else {
+								if(desk !== undefined && desk.date !== undefined){
+									socket.emit('deskCreationDate', desk.date);
+								} 
+							}
+						});
+
+
+						//create desk upload folder
+						var dir = app.uploadFolder + '/' + deskName;
+						fs.stat(dir, function(error, stats) {
+							if(typeof stats=='undefined' || !stats.isDirectory()) {
+								fs.mkdir(dir, 448, function(error) {
+									if (error) throw new Error('could not create ' + app.uploadFolder + ' folder');
+								});
+							}
+						});
+					}
+				}
+			});			
 		});
 
-		client.on('disconnect', function() {
-			leaveRoom(client);
+
+		//newFileAnnouce
+		//---------
+		//Client joins his room and initialization begins
+		socket.on('newFileAnnouce', function(file) {		
+			//Annouce to other clients
+			socket.broadcast.to(socket.deskName).emit('newFileAnnouce', file);
 		});
 
-	});
-	
-	
-	// Handlers
-	//--------------
-	
-	//Creates room and send files and users to Client
-	function initClient (client) {
 
-		getRoom(client, function(room) {	
-			//Send client all the files from the room
-			model.getAllFiles(room, function(err, files) {
-				client.send({ action: 'initFiles', data: files});
-			});
+		//moveFile
+		//---------
+		//Save file's new position and annouce it
+		socket.on('moveFile', function(file) {
 
-			roommates_clients = rooms.room_clients(room);
-			roommates = [];
+			//Save position in database
+			model.setFilePosition(null, file.id, file.position.x, file.position.y, function(error, _file) {
+				if(error) console.log("setFilePosition error:", error);	
+				else {
+					//Annouce to other clients
+					socket.broadcast.to(socket.deskName).emit('moveFileAnnouce', file);
 
-			var j = 0;
-			for (i in roommates_clients)
-			{
-				if (roommates_clients[i].sessionId != client.sessionId)
-				{
-					roommates[j] = {
-						sid: roommates_clients[i].sessionId,
-					};
-					j++;
 				}
-			}
+			});		
 
-			console.log('initialusers: ' + roommates);
-			client.send(
-				{
-					action: 'initialUsers',
-					data: roommates
+		});
+
+
+		//renameFile
+		//---------
+		//Save file's new name and annouce it
+		socket.on('renameFile', function(file) {
+
+			//Save name in database
+			model.renameFile(file.id, file.value, function(error, _file) {				
+				if(error) console.log("setFileName error:", error);	
+				else {
+					//Annouce to other clients
+					socket.broadcast.to(socket.deskName).emit('renameFileAnnouce', file);
 				}
-			)
+			});		
+		});
+
+		//deleteFile
+		//---------
+		//Delete file and annouce it
+		socket.on('deleteFile', function(data) {
 			
+			//Annouce to other clients
+				
+			var fileId = data.fileId;
+			app.model.getDesk(socket.deskName, function(error, desk) {
+				if(error) console.log('Error');
+				else {
+
+					var isAuthorized = true;
+					if(desk !== undefined && 'protection' in desk && 'identifier' in data) {
+						if(data.identifier != desk.protection.identifier) {
+							isAuthorized = false;	
+						} 
+					} 
+
+					//Access granted
+					if(isAuthorized) {
+
+						model.getFile(fileId, function(error, _file) {
+							if(error) console.log(error);
+							else {
+								model.deleteFile(fileId, function(error, __file) {
+									if(error) console.log(error);
+									else {
+
+										//Annouce to other clients
+										io.sockets.in(socket.deskName).emit('deleteFileAnnouce',fileId);
+
+										//delete file on storage
+										fs.unlink(_file.location, function(error, test) {
+											if(error) console.log('error delete file from storage: ', error);
+										});
+
+									}
+								});
+							}
+						});
+					} else {
+						
+						socket.emit('notAllowed');
+					}
+				}
+			});
+
 		});
-	}
 
-	//Adds client to a room and sends an annoucement to other clients
-	function joinRoom (client, room, successFunction) {
-		var msg = {
-			action : 'join-announce',
-			data : { sid: client.sessionId, user_name: client.user_name }
-		}
 
-		rooms.add_to_room_and_announce(client, room, msg);
+		//On Client Disconnect
+		//---------
+		//Removing client from desk an annouce to others
+		socket.on('disconnect', function () {	
 
-		//create desk upload folder
-		var dir = app.uploadFolder + '/' + room;
-		fs.stat(dir, function(error, stats) {
-			if(typeof stats=='undefined' || !stats.isDirectory()) {
-				fs.mkdir(dir, 448, function(error) {
-					if (error) throw new Error('could not create ' + app.uploadFolder + ' folder');
-				});
-			}
+			//Annouce leave to other clients
+			socket.broadcast.to(socket.deskName).emit('leaveAnnouce', socket.id);
+
+			//leaves automatically the room
+
 		});
 
-		successFunction();
-	}
-	
-	//Removes client from a room and sends an annoucement to other clients
-	function leaveRoom (client) {
-		console.log (client.sessionId + ' just left');
-		var msg = {};
-		msg.action = 'leave-announce';
-		msg.data	= { sid: client.sessionId };
-		rooms.remove_from_all_rooms_and_announce(client, msg);
-
-	}
-	
-
-	//Saves new destination of file
-	function moveFile(client, msg) {
-				var messageOut = {
-			action: msg.action,
-			data: {
-				id: msg.data.id,
-				position: {
-					left: msg.data.position.left,
-					top: msg.data.position.top
+		//New chat message
+		//---------
+		socket.on('newMessage', function(data) {
+			if(data.toUsers.length === 0) {
+				socket.broadcast.to(data.room).emit('newMessage',data);	
+			} else {
+				for(i in data.toUsers) {
+					io.sockets.socket(data.toUsers[i].sid).emit('newMessage',data);
 				}
 			}
-		};
-		//report to all other clients
-		broadcastToRoom( client, messageOut );
-
-		model.setFilePosition(null, msg.data.id, msg.data.position.left, msg.data.position.top, function(error, file) {
-			console.log("setFilePosition error:", error);	
 		});
-	}
 
-	//Creates new file and reposts to other clients
-	function newFile (client, data) {
-		var msg = {
-			action: 'newFile',
-			data: data
+		//Renames user
+		//---------
+		socket.on('renameUser', function(user) {
+			io.sockets.socket(user.sid).username = user.username;	
+			socket.broadcast.to(io.sockets.socket(user.sid).deskName).emit('renameUser',user);	
+		});	
+
+		// Password change
+		//---------
+		socket.on('setPassword', function(data) {
+			io.sockets.in(data.room).emit('setPassword',data); 
+		});
+	});
+
+	//Helper
+	
+	/* Creats a random Color
+	 *  */
+	function getRandomColorObject() {
+		
+		function randomXToY() {
+			var minVal = 100;
+				maxVal = 200;
+			return  Math.round(minVal+(Math.random()*(maxVal-minVal)));
 		}
-		broadcastToRoom(client, msg);
 
+		var colorObject = {
+			r:randomXToY(),
+			g:randomXToY(),
+			b:randomXToY()
+		}
+		return colorObject;
 	}
 
-	//Renames file and reports to other clients
-	function renameFile (client, fileId, newName) {
-		model.renameFile(fileId, newName, function(error, file) {
-			var msg = {};
-			msg.action = 'renameFile';
-			msg.data = { id: fileId, value: newName };
-			broadcastToRoom(client, msg);
-			//broadcast?
-			//console.log(error);
-		});
+	function isEmpty(ob){
+	   for(var i in ob){ return false;}
+	  return true;
 	}
 
-	//Delets Ffile and report
-	function deleteFile (client, fileId) {
-		model.getFile(fileId, function(error, file) {
-			if(error) {
-				console.log(error);
-			}
-			else {
-				model.deleteFile(fileId, function(error, file) {
-					if(error) {
-						console.log(error);
-					}
-					else {
-						var msg = {
-							action : 'deleteFile',
-							data : { id: fileId }
-						};
-						broadcastToRoom(client, msg);
-					}
-				});
-			}
-			//delete file on storage
-			fs.unlink(file.location, function(error, test) {
-			});
-		});
-	}
-
-	//Returns the room the client is in.
-	function getRoom( client , callback ) {
-		room = rooms.get_room( client );
-		//console.log( 'client: ' + client.sessionId + " is in " + room);
-		callback(room);
-	}
-
-	//Broadcasts a message to other clients than the given one
-	function broadcastToRoom ( client, message ) {
-		rooms.broadcast_to_roommates(client, message);
-	}
 	
 }
 

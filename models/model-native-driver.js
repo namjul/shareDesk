@@ -68,7 +68,7 @@ db.prototype.createDesk = function(deskName, callback) {
     this.getCollection(function(error, desk_collection) {
 		if( error ) callback(error)
       	else {
-					 var currentDate = new Date();
+			var currentDate = new Date();
         	desk_collection.insert({name:deskName, date: currentDate}, function(error, objects) {
 				if( error ) callback(error)
 				else callback(null, objects);
@@ -137,7 +137,7 @@ db.prototype.getFile = function(id, callback) {
 		if(error) callback(error)
 		else {
 			desk_collection.findOne({'files._id':ObjectId(id)}, function(error, desk) {
-				if(error) callback(error)
+				if(error) callback(error);
 				else {
 					if(desk) {
 						for(var i in desk.files) {
@@ -231,5 +231,57 @@ db.prototype.deleteFile = function(id, callback) {
       	}
     });
 };
+
+//Password protection Operations
+//-----
+db.prototype.setPassword = function(deskName, protectionObject, toRemove, callback) {
+    this.getCollection(function(error, desk_collection) {
+      	if( error ) callback(error)
+      	else {
+			if(toRemove) {
+
+				desk_collection.update(
+						{name: deskName},
+						{ $unset : { 'protection' : 1} },
+						function(error, deskSecureObject) {
+							if( error ) callback()
+							else callback(null, deskSecureObject);
+						}
+				);
+	
+
+			} else {
+      			desk_collection.update(
+						{name: deskName},
+						{$set:{'protection': protectionObject}},
+						function(error, deskSecureObject) {
+							if( error ) callback()
+							else callback(null, deskSecureObject);
+						}
+				);
+			}
+      	}
+    });
+};
+
+// Add a download-click to file
+//-----
+db.prototype.addDownloadClick = function(id, callback) {
+    this.getCollection(function(error, desk_collection) {
+      	if( error ) callback(error)
+      	else {
+      		desk_collection.update(
+						{'files._id': ObjectId(id)},
+						{$inc:{'files.$.downloads': 1}},
+						function(error, file) {
+							if( error ) callback(file)
+							else callback(null, file);
+						}
+			);
+      	}
+    });
+};
+
+
 
 exports.db = db;
