@@ -11,7 +11,7 @@ $(function() {
 	});
 
 	$('#shareDesk').click(function() {
-		$('div.about').animate({left:'1000px', opacity:0}, 500, function() {
+		$('div.info').animate({left:'1000px', opacity:0}, 500, function() {
 			$('.start').css('display','block');
 			$('.start').animate({left:0, opacity:1}, 500);
 			$('.sdInput').animate({left:0, opacity:1}, 500);
@@ -26,8 +26,8 @@ $(function() {
 		
 		$('.sdInput').animate({left:'-1000px', opacity:0}, 500);
 		$('.start').delay(100).animate({left:'-1000px', opacity:0}, 500, function() {
-			$('div.about').css('display','block');
-			$('div.about').animate({left:0, opacity:1}, 500);
+			$('div.info').css('display','block');
+			$('div.info').animate({left:0, opacity:1}, 500);
 			$(this).css('display', 'none');	
 		});
 
