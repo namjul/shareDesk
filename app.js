@@ -13,7 +13,7 @@ var connect = require('connect'),
 	formidable = require('formidable'),
 	exec = require('child_process').exec,
 	demoDeskTimeOutinDays = 3,
-	deskTimeOutinDays = 60,
+	deskTimeOutinDays = 30,
 	path = require('path'),
 	fs = require('fs'),
 	socketio = require('socket.io'),
@@ -469,14 +469,20 @@ app.post('/:deskname/password', function(req, res) {
 		if(error) console.log('Error in getting desk from database', error);
 		else {
 
+
 			if(desk === undefined) {
 				resObject.state = 0;
 				resObject.message = 'you need to upload files first before setting a password';
 				res.send(resObject);
 				
 			} else {
-				
-				if('protection' in desk ) {
+
+				if(desk.name === 'demo') {
+					resObject.state = 0;
+					resObject.message = 'the demo desk does not allow password protection';
+					res.send(resObject);
+
+				} else if('protection' in desk ) {
 
 					if(req.cookies.identifier != desk.protection.identifier) {
 						resObject.state = 0;
