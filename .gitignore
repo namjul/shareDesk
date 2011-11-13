@@ -1,5 +1,28 @@
-.DS_Store
+## generic files to ignore
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*~
+*.lock
+*.DS_Store
 *.swp
+*.out
 
-# Folders 
-uploads
+pids
+logs
+results
+
+node_modules
+npm-debug.log
+
+tmp/*
+log/*
+.livereload
+.monitor
+
+uploads/*
