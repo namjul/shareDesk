@@ -426,7 +426,7 @@ app.post('/:deskname/login', function(req, res) {
 
 					if(passwordHash != desk.protection.passwordHash) {
 						resObject.state = 0;
-						resObject.message = 'You entern a wrong password';
+						resObject.message = 'You have entered a wrong password';
 						res.send(resObject);
 
 					} else {
