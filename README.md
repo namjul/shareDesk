@@ -1,6 +1,6 @@
 ![sharedesk logo](http://sharedesk.at/images/logo.png)
 
-what is ShareDesk?
+What is ShareDesk?
 -------------
 [ShareDesk](http://sharedesk.at) is a web based file sharing tool build on
 node.js, websockets(socket.io), HTML5/CSS3, jQuery.
@@ -30,14 +30,42 @@ of your project (set a password if you want) and start dragging files :)
 
 or you use it on your own server, below are some instruction how to install it.
 
-installation
+Installation
 ------------
-coming...
+1. node.js
+You can find the installation instruction for you system at the github wiki of nodejs (https://github.com/joyent/node/wiki/Installation).
+Sharedesk will not work on Windows systems.
 
-licence
+2. NPM
+To install the node modules used in sharedesk, you need the node package manager (NPM). The installation instruction can be find at the npm github page (https://github.com/isaacs/npm).
+
+3. MongoDB
+Sharedesk uses mongoDB as the database. It can also be installed on different systems. The instruction are on the mongoDB website (http://www.mongodb.org/display/DOCS/Quickstart).
+
+4. shareDesk
+As we have installed the runtime environment we can proceed with shareDesk.
+There are two ways to get shareDesk:
+* Download the archive file (zip) and extract it to your directory (https://github.com/namjul/shareDesk/zipball/master).
+* Get shareDesk by cloning it with git: `git clone git://github.com/eeezyy/shareDesk.git`
+
+5. Modules
+
+Go to your shareDesk folder in the console and run the following command:
+`npm install`
+
+Run the server
+------------
+Start the mongoDB deamon: `mongod &`
+
+Start shareDesk in the shareDesk directory: node app.js
+To start shareDesk on a different port then 80, just append the port: node app.js 8080
+
+On linux systems you can assure that shareDesk runs even if you are logged out from your system by prepending the command `nohup`: `nohup node app.js`
+
+Licence
 ------------
 ShareDesk — A web based file sharing tool.
-Copyright (C) 2011 Samuel Hobl, Alexander Kumbeiz, Goran Janosevicz
+Copyright (C) 2011 Samuel Hobl, Alexander Kumbeiz, Goran Janosevic
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
