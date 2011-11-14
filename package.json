@@ -1,0 +1,15 @@
+{
+  "name": "sharedesk.at",
+  "description": "A starting boilerplate for node.js Apps in MVC",
+  "version": "0.0.1",
+  "engine": "node 0.4.1",
+  "main": "app.js",
+  "dependencies": {
+    "express": ">= 2.2.2",
+    "connect": ">= 1.4.2",
+    "connect-mongodb": ">= 1.1.1",
+    "formidable": ">= 1.0.7",
+    "jade": ">= 0.17.0",
+    "socket.io": ">= 0.8.7"
+  }
+}
