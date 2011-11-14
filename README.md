@@ -33,16 +33,20 @@ or you use it on your own server, below are some instruction how to install it.
 Installation
 ------------
 1. node.js
+
 You can find the installation instruction for you system at the github wiki of nodejs (https://github.com/joyent/node/wiki/Installation).
 Sharedesk will not work on Windows systems.
 
 2. NPM
+
 To install the node modules used in sharedesk, you need the node package manager (NPM). The installation instruction can be find at the npm github page (https://github.com/isaacs/npm).
 
 3. MongoDB
+
 Sharedesk uses mongoDB as the database. It can also be installed on different systems. The instruction are on the mongoDB website (http://www.mongodb.org/display/DOCS/Quickstart).
 
 4. shareDesk
+
 As we have installed the runtime environment we can proceed with shareDesk.
 There are two ways to get shareDesk:
 * Download the archive file (zip) and extract it to your directory (https://github.com/namjul/shareDesk/zipball/master).
