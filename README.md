@@ -3,8 +3,9 @@
 What is ShareDesk?
 -------------
 [ShareDesk](http://sharedesk.at) is a web based file sharing tool build on
-node.js, websockets(socket.io), HTML5/CSS3, jQuery.
-It is compatible with newest version of chrome, firefox, safari	
+node.js, websockets(socket.io), HTML5/CSS3, jQuery.  
+It is compatible with newest version of chrome, firefox, safari.
+
 ![Demo Board](http://sharedesk.at/images/screenshot.png)
 
 See a demo here:
@@ -25,7 +26,7 @@ Features
 Usage
 ------------
 If you wanna share files with ShareDesk just append to the url the name
-of your project (set a password if you want) and start dragging files :)
+of your project (set a password if you want) and start dragging files :)  
 [sharedesk.at/nameofyourproject](http://sharedesk.at/nameofyourproject) 
 
 or you use it on your own server, below are some instruction how to install it.
@@ -64,10 +65,11 @@ Run the server
 ------------
 Start the mongoDB deamon: `mongod &`
 
-Start shareDesk in the shareDesk directory: node app.js
+Start shareDesk in the shareDesk directory: node app.js  
 To start shareDesk on a different port then 80, just append the port: node app.js 8080
 
-On linux systems you can assure that shareDesk runs even if you are logged out from your system by prepending the command `nohup`: `nohup node app.js`
+On linux systems you can assure that shareDesk runs even if you are logged out from your system by prepending the command `nohup`:  
+`nohup node app.js`
 
 Licence
 ------------
