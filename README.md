@@ -65,8 +65,9 @@ Run the server
 ------------
 Start the mongoDB deamon: `mongod &`
 
-Start shareDesk in the shareDesk directory: node app.js  
-To start shareDesk on a different port then 80, just append the port: node app.js 8080
+Start shareDesk in the shareDesk directory: `node app.js`  
+To start shareDesk on a different port then 80, just append the port:  
+`node app.js 8080`
 
 On linux systems you can assure that shareDesk runs even if you are logged out from your system by prepending the command `nohup`:  
 `nohup node app.js`
