@@ -1,27 +1,25 @@
-div#shareDesk ShareDesk
-div#filesWrapper
-  div#filesArea
-  div#dragBack
-    div#dropSign
-      p
-div#uploadingFiles
-div#barWrapper
-  div#rightMenu
-    div#secure
-      span(class='#{isProtected}') #{isProtected}
-    div#meName
-  div#wrapLeft
-    div.timer(id='#{deskTimeOut}', title="time left until desktop resets") #{timeLeft}
-    div#chat
-      div#chatWindow.close
-        div#chatContentWrap
-          div#chatContent
-        div#chatButton <span>+ </span>Open Chat
-        span#chatExit [esc] to exit
-      div#label Send to <p><span class="allUsers">all</span></p> :
-      p#inputWrap
-        input
-ul#userBar
-a#sort(href="#")  tidy up
-iframe#downloadiFrame(style="display:none;")
+!!! 5
+html(lang="en")
+  head
+    title ShareDesk
+    meta(charset='utf-8')
+    meta(name='description', content='dropbox file shareing tool')
+    meta(name='copyright', content='Copyright (c) Sharedesk 2011.')
+    meta(name='viewport', content='width=device-width,initial-scale=1.0')
 
+    <meta property="og:title" content="ShareDesk - A dropBox file sharing tool"/>
+    <meta property="og:type" content="webapp"/>
+    <meta property="og:site_name" content="ShareDesk"/>
+
+    link(rel='stylesheet', href='http://localhost:9294/application.css')
+    script(src='http://localhost:9294/application.js')
+    script(type='text/javascript')
+      var jQuery  = require("jqueryify");
+      var exports = this;
+      jQuery(function(){
+        var App = require("index");
+        exports.app = new App();      
+      });
+
+
+  body

@@ -1,0 +1,8 @@
+<div class="left">
+  <h1>desktop<span>take your file from there</span></h1>
+</div>
+<div class="right">
+  <h1>sharedesk<span>and drop it here</span></h1>
+  <a href='http://dropbox.com' class="db-info" title="this app allows you to sync your files with dropbox">DROPBOX SYNC</a>
+</div>
+

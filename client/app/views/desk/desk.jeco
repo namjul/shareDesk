@@ -1,0 +1,10 @@
+<header>
+  <h1>sharedesk</h1>
+  <div class="search-area"></div>
+  <a href="#" class="tags">tags</a>
+  <ul class="list-view-menu">
+    <li class="grid-view active">grid</li>
+    <li class="list-view">row</li>
+  </ul>
+</header>
+<div class="desk-content"></div>

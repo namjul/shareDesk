@@ -1,0 +1,520 @@
+/* --------------------------------------------
+ * MODULES
+ * ---------------------------------------------*/
+
+/* === Drag & Drop Module === */
+#dropper
+  position absolute
+  top 0
+  bottom 0
+  left 0
+  right 0
+  display fixed
+
+/* === Starter Module === */
+.start
+  position relative
+  width 50%
+  height 100%
+  background #fff
+  background -webkit-gradient(linear, left top, left bottom, from(#fff), color-stop(50%, #f5f6f7), to(#c2c9ce))
+  background -moz-linear-gradient(top, #fff 0%, #f5f6f7 50%, #c2c9ce 100%)
+  background linear-gradient(top, #fff 0%, #f5f6f7 50%, #c2c9ce 100%)
+
+  .left
+    position absolute
+    top 0
+    right 0
+    width 100%
+    height 100%
+    h1 
+      position absolute
+      top 50% 
+      right 100px
+      width 223px
+      height 95px
+      margin-top -50px
+      background url(images/sprite.png) no-repeat 0 -100px
+      text-indent -9999px
+    img
+      position absolute 
+      top 0
+      right 200px
+      height 100%
+
+  .right
+    position absolute
+    top 50%
+    right 0
+    width 300px
+    height 400px
+    margin-right -400px
+    margin-top -50px
+    h1
+      width 223px
+      height 100px
+      background url(images/sprite.png) no-repeat
+      text-indent -9999px
+      margin 0
+      padding 0
+      &.small
+        height 48px
+
+    .db-info
+      display inline-block
+      margin-top 80px
+      border-radius(30px)
+      border solid 1px #2f2f2f
+      padding 15px 30px 15px 60px
+      color #848484
+      font-size 12px
+      font-family 'PTSansCaptionRegular' 
+      background url(images/sprite.png) no-repeat 0 -187px
+      text-decoration none
+
+
+/* === Starter Upload Module === */
+.uploadInput
+  position relative
+  margin-top 20px
+  
+  .input
+    position absolute
+    top 0
+    left 0
+    width 323px
+    height 51px
+    background url('images/sprite.png') no-repeat 0px -236px
+    input
+      position absolute
+      top 0
+      left 0
+      width 243px
+      height 51px
+      background transparent
+      border none
+      padding 0 60px 0 20px
+      font-size 20px
+      color #979797
+    span
+      position absolute
+      top 0
+      right 8px
+      color #444444
+      font-size 20px
+      margin 15px
+
+  .input-info
+    position absolute
+    top 1px
+    left 0
+    width 323px
+    height 51px
+    background url('images/sprite.png') no-repeat 0px -288px
+    &.hidden
+      display none
+
+
+  .progress
+    position absolute
+    top 0
+    left 0
+    width 323px
+    height 51px
+    background #232323
+    overflow hidden
+    span
+      display block
+      width 0%
+      height 100%
+      background #181818
+
+
+/* === Settings Module === */
+.settings
+  position fixed
+  top 0
+  left 0
+  background #fff
+  overflow hidden
+  width 35px
+  height 100%
+  z-index 2
+  transition(width, 0.3s, ease-out)
+  &:hover
+    width 286px
+
+  h1
+    font-family 'PTSansCaptionRegular' 
+    color #c9c9c9
+
+  .wrap
+    position absolute
+    top 50%
+    right 35px
+    width 216px
+
+  ul
+    list-style none
+    margin 0
+    padding 0
+  li
+    height 75px
+    border-bottom solid 1px #efecec
+    &:last-child
+      border none
+  a
+    display block
+    height 75px
+    line-height 75px
+    text-decoration none
+    font-family 'PTSansCaptionRegular' 
+    font-size 20px
+    color #c9c9c9
+    padding-left 50px
+
+  .private
+    background url('images/sprite.png') no-repeat -282px -70px
+    color #5e5e5e
+
+  .open
+    background url('images/sprite.png') no-repeat -282px -0px
+    color #b6b6b6
+
+  .dropbox
+    background url('images/sprite.png') no-repeat -282px -140px
+    color #48a5ff
+
+
+/* ============= DESK MODULES ============= */
+
+/* === Desk Header Module === */
+.desk header
+  position relative 
+  z-index 1
+  width 900px
+  height 50px
+  margin 0 auto
+  padding 0 20px
+  box-sizing border-box
+
+  h1
+    font-family 'PTSansCaptionRegular' 
+    color #fff
+    margin 0
+    line-height 50px
+    float left
+
+  .search-area
+    float left
+    width 480px
+    height 100%
+    padding 0 40px
+
+  a.tags
+    float left
+    font-family 'ProximaNovaRegular' 
+    color #fff
+    margin 0
+    text-decoration none
+    font-size 20px
+    line-height 50px
+    font-weight normal
+    &:hover
+      color 
+
+  ul.list-view-menu
+    list-style none
+    float left
+
+    li 
+      float left
+      text-indent -9999px
+      width 18px
+      height 18px
+      margin-left 8px
+      cursor pointer
+
+    li.grid-view.active
+      background url('images/sprite.png') no-repeat -12px -351px
+    li.grid-view
+      background url('images/sprite.png') no-repeat -12px -371px
+
+    li.list-view.active
+      background url('images/sprite.png') no-repeat -36px -351px
+    li.list-view
+      background url('images/sprite.png') no-repeat -36px -371px
+
+
+
+/* === Desk Search Module === */
+.search-bar-over
+  width 100%
+  background 212121
+  background rgba(33,33,33,0.65)
+  border-radius(25px)
+  box-shadow(0 1px rgba(255,255,255,0.1))
+
+.search-bar
+  position relative
+  min-height 50px
+  width 100%
+  border-radius(25px)
+  inset-box-shadow(0 3px 5px -2px #000)
+
+.find-tag-fake
+  position absolute
+  top 17px
+  left 30px
+  color #666666
+
+button.search-icon
+  position absolute
+  top 5px
+  right 6px
+  height 40px
+  width 40px
+  text-indent -9999px
+  background url('images/sprite.png') no-repeat -66px  -342px
+  border none
+  &:focus 
+    outline none
+
+ul.tag-input-list
+  list-style none
+  margin 0 0 0 4px
+  padding 0 0 5px 0
+  overflow hidden
+
+  li
+    float left
+
+  li.tag-field
+    height 38px
+    background #2f2f2f
+    border solid 1px rgba(255,255,255,0.05)
+    color #848484
+    text-transform uppercase
+    font-size 12px
+    line-height 38px
+    padding 0 10px
+    margin 5px 2px 0 1px
+    cursor pointer
+    font-weight bold
+    border-radius(20px)
+
+    &.select-for-delete
+      border solid 1px rgba(255,255,255,0.2)
+
+  li.tag-input-field input
+    width 150px
+    margin 10px 0 0 10px
+    padding 0
+    border none
+    line-height 30px
+    color #848484
+    background transparent
+
+/* === Inline Bar Module === */
+.inline
+  width 100%
+  box-shadow(0 1px rgba(255,255,255,0.05))
+  overflow hidden
+
+.inline.fake
+  box-shadow none
+
+.inline.real
+  position absolute
+  top 0
+  left 0
+
+.inline.inline-tags
+  position relative
+
+  .inline-bar-arrow
+    right 122px
+    left auto
+
+.inline-bar
+  width 100%
+  margin-top 20px
+  background 212121
+  background rgba(33,33,33,1)
+  inset-box-shadow(0 3px 5px -2px #000)
+
+.inline-bar-wrap
+  position relative
+  width 900px
+  margin 0 auto
+
+.inline-bar-arrow
+  position absolute
+  top -13px
+  left 0
+  width 25px
+  height 28px
+  background url('images/sprite.png') no-repeat -117px -350px
+  text-indent -9999px
+
+.inline-bar-content
+  padding 20px
+
+  // tags 
+  ul.taglist
+    list-style none
+    overflow hidden
+    margin 0
+    padding 0
+
+    li
+      float left
+      color #848484
+
+      label, a
+        display block
+        text-decoration none
+        font-size 15px
+        height 30px
+        border-radius(15px)
+        border solid 1px #404040
+        line-height 30px
+        padding 0 20px
+        margin 3px 7px
+        color #848484
+        cursor pointer
+        font-family 'PTSansCaptionRegular'
+
+        &:hover
+          border solid 1px #646464
+
+      input
+        font-family 'PTSansCaptionRegular'
+        color #848484
+        border solid 1px green
+        background #242424
+        padding 0 10px
+        height 30px
+        margin 3px 7px
+        border-radius(15px)
+        border solid 1px #404040
+
+    li.download
+      color #fff
+      a
+        text-decoration none
+        border none
+
+/* === Files Grid Module === */
+.grid-files
+  position relative
+  margin 0 auto
+  width 900px
+
+.grid-files-row
+  position relative
+  width 100%
+  overflow hidden
+  margin 0 auto
+  text-align center
+
+  .grid-file
+    position relative
+    display inline-block
+    width 170px
+    height 180px
+    margin 30px 30px 0 0
+
+    .wrap
+      position absolute
+      width 158px
+      height 130px
+      border-radius(10px)
+      border solid 6px 
+      border-color rgba(33,33,33,0)
+      cursor pointer
+      transition: border-color 0.2s ease-in;
+      -moz-transition: border-color 0.2s ease-in;    /* FF3.7+ */
+      -o-transition: border-color 0.2s ease-in;      /* Opera 10.5 */
+      -webkit-transition: border-color 0.2s ease-in; /* Saf3.2+, Chrome */
+
+      .wrap-inside
+        width 156px
+        height 128px
+        border-radius(6px)
+        box-shadow(0 1px 3px rgba(0,0,0,0.3))
+        background-color #2f2f2f
+        border solid 1px rgba(255,255,255,0.05)
+        transition: background-color 0.2s ease-in;
+        -moz-transition: background-color 0.2s ease-in;    /* FF3.7+ */
+        -o-transition: background-color 0.2s ease-in;      /* Opera 10.5 */
+        -webkit-transition: background-color 0.2s ease-in; /* Saf3.2+, Chrome */
+
+      .wrap-inside.uploading
+        background-color #1a1a1a
+        border solid 1px #1a1a1a
+        box-shadow(none)
+        color #fff
+
+    .wrap.selected
+      border-color rgba(33,33,33,0.8)
+      box-shadow(none)
+
+    .filename
+      position absolute
+      top 136px
+      height 45px
+      line-height 45px
+      overflow hidden
+      padding 0 3px
+      width 164px
+      color #6a6a6a
+      text-align center
+      font-size 14px
+      font-family 'PTSansCaptionRegular'
+
+    &:first-child
+      margin-left 0
+
+    &:last-child
+      margin-right 0
+    
+    //uploding
+    .wrap-progress
+      position relative
+      top 30px
+      margin 0 auto
+      width 55px
+      height 56px
+      background #343434
+
+      .progress
+        position absolute
+        bottom 0
+        left 0
+        width 55px
+        height 0%
+        background #717171
+
+      .progress-icon
+        position absolute
+        top 0
+        left 0
+        width 55px
+        height 56px
+        background url('images/sprite.png') no-repeat -8px -410px
+
+    .progress-percentage
+      position relative
+      top 40px
+      margin 0 auto
+      width 55px
+      text-align center
+      display block
+      color #717171
+      font-family 'PTSansCaptionRegular'
+      font-size 16px
+
+
+
+

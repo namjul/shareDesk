@@ -1,0 +1,6 @@
+<% if @input == true: %>
+  <li class="tagInput"><input type="text" value="" /></li>
+  <li class="download"><a href="<%= @downloadLink %>">download</a></li>
+<% else: %>
+  <li><label><span><%= @name %></span></label></li>
+<% end %>

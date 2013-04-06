@@ -1,0 +1,12 @@
+<div class="wrap">
+  <div class="wrap-inside <%= if @uploading then 'uploading' %>">
+    <% if @uploading: %>
+    <div class="wrap-progress">
+      <div class="progress"></div> 
+      <div class="progress-icon"></div>
+    </div>
+    <span class="progress-percentage">0</span>
+    <% end %>
+  </div>
+</div>
+<div class="filename"><%= @name %></div>

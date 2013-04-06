@@ -1,0 +1,9 @@
+<div class="search-bar">
+  <span class="find-tag-fake">Search files by tags</span> 
+  <ul class="tag-input-list">
+    <li class="tag-input-field">
+      <input type="text" value="" /> 
+    </li>
+  </ul>
+  <button class="search-icon">search</button>
+</div>

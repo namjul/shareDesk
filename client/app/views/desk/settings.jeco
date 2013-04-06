@@ -1,0 +1,7 @@
+<div class="wrap">
+  <h1>settings</h1>
+  <ul>
+    <li><a href="#" class="open">Open</a></li> 
+    <li><a href="/<%= @deskname %>/dropbox" class="dropbox">Dropbox Sync</a></li> 
+  </ul>
+</div>

@@ -1,0 +1,9 @@
+<ul class="taglist">
+<% if @tags.length: %>
+  <% for tag in @tags: %>
+    <li><a href="#"><%= tag.name %></a></li>
+  <% end %>
+<% else: %>
+  <li>No tags</li>
+<% end %>
+</ul>

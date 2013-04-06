@@ -1,15 +1,26 @@
 {
   "name": "sharedesk.at",
-  "description": "A starting boilerplate for node.js Apps in MVC",
+  "description": "Filesharing application",
   "version": "0.0.1",
-  "engine": "node 0.4.1",
-  "main": "app.js",
+  "engine": "node 0.6.x",
+  "private": true,
+  "main": "server.js",
   "dependencies": {
-    "express": "= 2.2.2",
-    "connect": ">= 1.4.2",
-    "connect-mongodb": ">= 1.1.1",
-    "formidable": ">= 1.0.7",
-    "jade": ">= 0.17.0",
-    "socket.io": ">= 0.8.7"
+    "express": "2.5.x",
+    "jade": "0.20.x",
+    "mongoose": "2.5.x",
+    "formidable" : "1.0.x",
+    "dbox" : "0.3.x",
+    "es5-shimify": "0.0.x",
+    "json2ify": "0.0.x",
+    "jqueryify": "0.0.x",
+    "spine": "1.0.x",
+    "request": "2.9.x",
+    "async": "0.1.x"
+  },
+  "devDependencies": {
+    "expresso" : "0.9.x",
+    "database-cleaner" : "0.6.x",
+    "should" : "0.5.x"
   }
 }

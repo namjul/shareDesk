@@ -1,0 +1,20 @@
+{
+
+  "main": "./client/app/index",
+  "css": "./client/css",
+  "public": "./public",
+  "paths": ["./client/app"],
+  "libs": [],
+  "dependencies": [
+    "es5-shimify", 
+    "json2ify", 
+    "jqueryify", 
+    "spine",
+    "spine/lib/ajax",
+    "spine/lib/route",
+    "spine/lib/tmpl",
+    "spine/lib/manager",
+    "spine/lib/relation"
+  ]
+
+}

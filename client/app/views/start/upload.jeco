@@ -1,0 +1,8 @@
+<div class="progress">
+  <span></span>
+</div>
+<div class="input-info hidden"></div>
+<div class="input">
+  <input type="text" title="Name of your Desktop" value="Name of your Desktop">
+  <span></span>
+</div>
