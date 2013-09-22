@@ -4,7 +4,7 @@ $(function() {
 
 	$('.sdInput input').keyup(function(e) {
 		if(e.keyCode == 13) {//Enter
-			var value = escape($(this).val()); 
+			var value = encodeURIComponent($(this).val()); 
 			window.location.href = value; 
 			return false;
 		}
