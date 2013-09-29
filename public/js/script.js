@@ -903,7 +903,7 @@ function newMessage(msg, user) {
  * */
 function resize() {
 
-	chatWindow(true);
+	//chatWindow(true);
 }
 
 
