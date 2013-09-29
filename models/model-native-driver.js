@@ -16,6 +16,13 @@ db = function(database, callback) {
 	
 	this.db.open(function(err, db) {
 		if(db == null) throw new Error('no database connection');
+		db.authenticate(conf.user, conf.pwd, function(err2, res) {
+			if(res) {
+	       		console.log("auth...DB open");
+			} else {
+		       	console.log("not auth..." + err2 + ' ' + res);
+			}
+		});
 		db.collection('desks', function(err, collection) {
 			// make sure we have an index and unique constrain on name 
 			collection.ensureIndex({name : 1}, {unique : true}, function() {}) 
