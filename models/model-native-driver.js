@@ -150,6 +150,7 @@ db.prototype.getFile = function(id, callback) {
 						for(var i in desk.files) {
 							if(desk.files[i]._id==id) {
 								callback(null, desk.files[i]);
+								return;
 							}
 						}
 						callback(null, []);

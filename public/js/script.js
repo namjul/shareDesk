@@ -520,9 +520,9 @@ function setFileHandler($fileHtml, file) {
 	$fileHtml.find('.download').bind('mouseup',	function(){
 		if(!hasDragged) {
 			var ifrm = document.getElementById('downloadiFrame');
-    		ifrm.src = 'http://' + location.host + '/' + location.pathname.split('/')[1] + '/download/' + file._id;
+    		//ifrm.src = 'http://' + location.host + '/' + location.pathname.split('/')[1] + '/download/' + file._id;
 			
-			//window.open('http://' + location.host + '/' + location.pathname.split('/')[1] + '/download/' + file._id, '_blank');
+			window.open('http://' + location.host + '/' + location.pathname.split('/')[1] + '/download/' + file._id, '_blank');
 		}
 	});
 
