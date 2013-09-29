@@ -48,6 +48,10 @@ The installation instruction can be find at the npm github page (https://github.
 Sharedesk uses mongoDB as the database. It can also be installed on different systems.  
 The instruction are on the mongoDB website (http://www.mongodb.org/display/DOCS/Quickstart).
 
+Secure mongoDB and add sharedesk user:<br />
+http://docs.mongodb.org/manual/tutorial/add-user-administrator/#id1 <br />
+http://docs.mongodb.org/manual/tutorial/add-user-to-database/
+
 **shareDesk**
 
 As we have installed the runtime environment we can proceed with shareDesk.
@@ -56,6 +60,8 @@ There are two ways to get shareDesk:
 * Get shareDesk by cloning it with git:  
 `git clone git://github.com/eeezyy/shareDesk.git`
 
+Change mongoDB configuration and authentification in `config.js`.
+
 **Modules**
 
 Go to your shareDesk folder in the console and run the following command:  
@@ -63,7 +69,7 @@ Go to your shareDesk folder in the console and run the following command:
 
 Run the server
 ------------
-Start the mongoDB deamon: `mongod &`
+Start the mongoDB deamon: `mongod --auth &`
 
 Start shareDesk in the shareDesk directory: `node app.js`  
 To start shareDesk on a different port then 80, just append the port:  
