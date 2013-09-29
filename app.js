@@ -124,7 +124,7 @@ app.get('/:deskname', function(req, res){
 					//render passwortrequest view
 					res.render('password.jade', {
 						locals: {
-							pageTitle: ('shareDesk - ' + req.params.deskname),
+							pageTitle: ('ShareDesk - ' + req.params.deskname),
 						}
 					});
 
@@ -159,7 +159,8 @@ app.get('/:deskname', function(req, res){
 						//render view
 						res.render('index.jade', {
 							locals: {
-								pageTitle: ('shareDesk - ' + req.params.deskname),
+								pageTitle: ('ShareDesk - ' + req.params.deskname),
+								deskname: '' + req.params.deskname,
 								timeLeft: 'ShareDesk',
 								deskTimeOut: deskTimeOut*86400000, 
 								isProtected: isProtected ? 'private' : 'public'
@@ -170,7 +171,8 @@ app.get('/:deskname', function(req, res){
 					//render view
 					res.render('index.jade', {
 						locals: {
-							pageTitle: ('shareDesk - ' + req.params.deskname),
+							pageTitle: ('ShareDesk - ' + req.params.deskname),
+							deskname: '' + req.params.deskname,
 							timeLeft: '',
 							deskTimeOut: deskTimeOut*86400000,
 							isProtected: isProtected ? 'private' : 'public'
@@ -181,7 +183,8 @@ app.get('/:deskname', function(req, res){
 				//render view
 				res.render('index.jade', {
 					locals: {
-						pageTitle: ('shareDesk - ' + req.params.deskname),
+						pageTitle: ('ShareDesk - ' + req.params.deskname),
+						deskname: '' + req.params.deskname,
 						timeLeft: 'ShareDesk',
 						deskTimeOut: deskTimeOut*86400000,
 						isProtected: isProtected ? 'private' : 'public'
@@ -214,7 +217,7 @@ app.get('/:deskname/download/:fileid', function(req, res) {
 					//render passwortrequest view
 					res.render('password.jade', {
 						locals: {
-							pageTitle: ('shareDesk - ' + req.params.deskname),
+							pageTitle: ('ShareDesk - ' + req.params.deskname),
 						}
 					});
 
@@ -232,7 +235,7 @@ app.get('/:deskname/download/:fileid', function(req, res) {
 						path.exists('./' + file.location, function(exists) {
 							if(!exists || !file) {
 								res.render('brokenfile.jade', {
-									locals: {pageTitle: ('shareDesk - ' + req.params.deskname) },
+									locals: {pageTitle: ('ShareDesk - ' + req.params.deskname) },
 									layout: 'layoutSimple.jade'
 								});
 								return;
