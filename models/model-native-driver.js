@@ -152,6 +152,7 @@ db.prototype.getFile = function(id, callback) {
 								callback(null, desk.files[i]);
 							}
 						}
+						callback(null, []);
 					}
 					else {
 						callback(null, []);
